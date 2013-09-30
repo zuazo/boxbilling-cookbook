@@ -1,0 +1,65 @@
+<?php
+/**
+ * BoxBilling configuration file
+ *
+ * If you are not using the web-installer, you can rename this file
+ * to "bb-config.php" and fill in the values.
+ * Import /install/structure.sql to your database
+ * Open browser http://www.youdomain.com/bb-admin.php to create new admin account.
+ * Remove /install directory
+ */
+
+/** Define timezone */
+date_default_timezone_set('<%= @timezone %>');
+
+/** Database settings - You can get this info from your web host ** //
+/** The name of the database for BoxBilling */
+define('BB_DB_NAME', '<%= @db_name %>');
+
+/** Database username */
+define('BB_DB_USER', '<%= @db_user %>');
+
+/** Database password */
+define('BB_DB_PASSWORD', '<%= @db_password %>');
+
+/** Database hostname. Don't change this if in doubt. */
+define('BB_DB_HOST', '<%= @db_host %>');
+
+/** Database type. Don't change this if in doubt. */
+define('BB_DB_TYPE', 'mysql');
+
+/** Full URL where BoxBilling is installed with trailing slash */
+define('BB_URL', '<%= @url %>');
+
+/** Set BoxBilling license key. Get license key at http://www.boxbilling.com */
+define('BB_LICENSE', '<%= @license %>');
+
+/* Set BoxBilling locale */
+define('BB_LOCALE', '<%= @locale %>');
+
+/* Set default date format for localized strings
+ * Format information: http://php.net/manual/en/function.strftime.php
+ */
+define('BB_LOCALE_DATE_FORMAT', '%A, %d %B %G');
+
+/* Set default time format for localized strings
+ * Format information: http://php.net/manual/en/function.strftime.php
+ */
+define('BB_LOCALE_TIME_FORMAT', ' %T');
+
+/* Set default date format. Not translatable
+ * Date Format information: http://php.net/manual/en/function.date.php
+ */
+define('BB_DATE_FORMAT', 'l, d F Y');
+
+/* Set location to store sensitive data */
+define('BB_PATH_DATA', dirname(__FILE__) . '/bb-data');
+
+/** 
+ * Enable or Disable search engine friendly urls. 
+ * Configure .htaccess file before enabling this feature 
+ */
+define('BB_SEF_URLS', <%= @sef_urls ? 'TRUE' : 'FALSE' %>);
+
+/** Enable or Disable the display of notices */
+define('BB_DEBUG', <%= @debug ? 'TRUE' : 'FALSE' %>);
