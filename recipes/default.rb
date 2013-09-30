@@ -267,12 +267,12 @@ if node['boxbilling']['cron_enabled']
   cron 'boxbilling cron' do
     user node['apache']['user']
     minute '*/5'
-    command "php -f '#{node['boxbilling']['dir']}/cron.php'"
+    command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
   end
 else
   cron 'boxbilling cron' do
     user node['apache']['user']
-    command "php -f '#{node['boxbilling']['dir']}/cron.php'"
+    command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
     action :delete
   end
 end
