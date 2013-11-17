@@ -7,7 +7,11 @@ module BoxBilling
       http = Net::HTTP.new(uri.host)
       request = Net::HTTP::Post.new(uri.request_uri)
       request['Host'] = host
-      request['User-Agent'] = Chef::REST::RESTRequest.user_agent
+      request['User-Agent'] = if defined?(Chef::HTTP::HTTPRequest)
+        Chef::HTTP::HTTPRequest.user_agent
+      else
+        Chef::REST::RESTRequest.user_agent
+      end
       request.set_form_data(params)
       response = http.request(request)
       if (response.code.to_i >= 400)
