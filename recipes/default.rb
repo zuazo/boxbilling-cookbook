@@ -181,9 +181,13 @@ end
 #==============================================================================
 
 # set writable directories
-%w{ cache log uploads }.each do |dir|
+%w{ cache log uploads }.each do |data_dir|
+  ::File.join(node['boxbilling']['dir'], 'bb-data', data_dir)
+end.push(
+  ::File.join(node['boxbilling']['dir'], 'bb-themes', 'boxbilling', 'assets')
+).each do |dir|
   directory dir do
-    path ::File.join(node['boxbilling']['dir'], 'bb-data', dir)
+    path dir
     owner node['apache']['user']
     group node['apache']['group']
     mode 00755
