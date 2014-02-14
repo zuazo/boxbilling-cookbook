@@ -181,7 +181,7 @@ end
 #==============================================================================
 
 # set writable directories
-%w{ cache log uploads }.each do |data_dir|
+%w{ cache log uploads }.map do |data_dir|
   ::File.join(node['boxbilling']['dir'], 'bb-data', data_dir)
 end.push(
   ::File.join(node['boxbilling']['dir'], 'bb-themes', 'boxbilling', 'assets')
@@ -190,7 +190,7 @@ end.push(
     path dir
     owner node['apache']['user']
     group node['apache']['group']
-    mode 00755
+    mode 00750
     action :create
   end
 end
@@ -256,7 +256,9 @@ end
 template '.htaccess' do
   path ::File.join(node['boxbilling']['dir'], '.htaccess')
   source 'htaccess.erb'
-  mode 00644
+  owner node['apache']['user']
+  group node['apache']['group']
+  mode 00640
   variables(
     :domain => node['boxbilling']['server_name'].gsub(/^www\./, ''),
     :sef_urls => node['boxbilling']['config']['sef_urls']
