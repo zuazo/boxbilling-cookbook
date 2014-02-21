@@ -16,6 +16,7 @@ action :request do
 
   opts = {
     :path => new_resource.path,
+    :data => new_resource.data,
     :api_token => api_token,
     :referer => node['boxbilling']['config']['url'],
     :debug => new_resource.debug
