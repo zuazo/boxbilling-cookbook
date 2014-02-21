@@ -1,4 +1,4 @@
-actions :request, :create, :delete
+actions :request, :create, :update, :delete
 
 attribute :path, :kind_of => String, :name_attribute => true
 attribute :data, :kind_of => Hash, :default => {}

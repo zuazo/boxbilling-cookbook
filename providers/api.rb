@@ -130,6 +130,25 @@ action :create do
   end
 end
 
+action :update do
+  get_keys = filter_keys_from_data(new_resource.data)
+  get_path = path_with_action(new_resource.path, :get)
+  read_data = boxbilling_api_request({
+    :path => get_path,
+    :data => get_keys,
+  })
+
+  if data_changed?(read_data, new_resource.data)
+    converge_by("Update #{new_resource}: #{new_resource.data}") do
+      update_path = path_with_action(new_resource.path, :update)
+      boxbilling_api_request({
+        :path => update_path,
+        :data => new_resource.data,
+      })
+    end
+  end
+end
+
 action :delete do
   get_keys = filter_keys_from_data(new_resource.data)
   get_path = path_with_action(new_resource.path, :get)
