@@ -54,7 +54,6 @@ module BoxBilling
       end
       if (resp.code.to_i >= 400)
         error_msg = "#{self.name}##{__method__.to_s}: #{resp.code} #{resp.message}"
-        Chef::Log.error(error_msg)
         raise error_msg
       else
         resp_json = JSON.parse(resp.body)
@@ -62,14 +61,12 @@ module BoxBilling
           error = resp_json['error']
           if error.has_key?('message')
             error_msg = "#{self.name}##{__method__.to_s}: #{error['message']}"
-            Chef::Log.error(error_msg)
             raise error_msg
           else
-            Chef::Log.error(error_msg)
             raise error_msg
           end
         end
-        Chef::Log.info("#{self.name}##{__method__.to_s} #{opts[:path]} result: #{resp_json['result'].to_s}")
+        Chef::Log.info("#{self.name}##{__method__.to_s} #{opts[:path]} result: #{resp_json['result'].to_s}") if opts[:debug]
         return resp_json['result']
       end
 
