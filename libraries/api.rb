@@ -41,7 +41,7 @@ module BoxBilling
         Chef::REST::RESTRequest.user_agent
       end
       unless @@cookie.nil?
-        request['Cookie'] = @@cookie
+        req['Cookie'] = @@cookie
       end
       req.basic_auth opts[:user], opts[:api_token] unless opts[:api_token].nil?
       req.body = opts[:data].to_json
