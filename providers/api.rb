@@ -133,6 +133,13 @@ action :create do
         :path => update_path,
         :data => update_keys,
       })
+      # run an update after the :create, required by some paths,
+      # some values are ignored/not_saved by the create action
+      update_path = path_with_action(new_resource.path, :update)
+      boxbilling_api_request({
+        :path => update_path,
+        :data => new_resource.data,
+      })
     end
   else
     if data_changed?(read_data, new_resource.data)
