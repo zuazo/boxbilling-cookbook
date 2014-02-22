@@ -65,11 +65,28 @@ def path_with_action(path, action)
   path + joiner + get_action_for_path(path, action)
 end
 
+# Some data values needs to be normalized to allow their
+# comparation to work as expected
+def normalize_data_value(v)
+  v = v.to_s
+  v.gsub(/^([0-9]+)[.]0+$/, '\1') # remove 0 decimals
+end
+
 def data_changed?(old, new)
-  new.each do |key, value|
-    return true if old[key.to_s].to_s != value.to_s
+  case new.class.to_s
+  when 'Hash'
+    return true unless old.kind_of?(Hash)
+    new.inject(false) do |res, (key, value)|
+      res || data_changed?(old[key.to_s], value)
+    end
+  when 'Array'
+    return true unless old.kind_of?(Array)
+    new.inject(false) do |res, (value, i)|
+      res || data_changed?(old[i], value)
+    end
+  else
+    normalize_data_value(old) != normalize_data_value(new)
   end
-  return false
 end
 
 def boxbilling_api_request(args={})
