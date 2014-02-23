@@ -113,7 +113,9 @@ def boxbilling_api_request(args={})
 end
 
 action :request do
-  boxbilling_api_request
+  converge_by("Request #{new_resource}: #{new_resource.data}") do
+    boxbilling_api_request
+  end
 end
 
 action :create do
