@@ -23,7 +23,7 @@ end
 # Get "primary keys" from data Hash
 def filter_keys_from_data(data)
   data.select do |key, value|
-    %w{id code type product_id}.include?(key.to_s)
+    %w{id code type product_id tld}.include?(key.to_s)
   end
 end
 
