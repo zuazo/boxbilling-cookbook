@@ -64,6 +64,13 @@ def normalize_data_value(v)
   v.gsub(/^([0-9]+)[.]0+$/, '\1') # remove 0 decimals
 end
 
+# Get "primary keys" from data Hash
+def get_primary_keys_from_data(data)
+  data.select do |key, value|
+    %w{id code type product_id tld}.include?(key.to_s)
+  end
+end
+
 def data_changed?(old, new)
   case new.class.to_s
   when 'Hash'
@@ -81,11 +88,21 @@ def data_changed?(old, new)
   end
 end
 
+# Check if the path supports an action
+def path_supports?(path, action)
+  path = filter_path(path)
+  action = action.to_sym
+
+  return false if path == 'admin/invoice/tax' and action == :get
+  return false if path == 'admin/invoice/tax' and action == :update
+  return true
+end
+
 def boxbilling_api_request(action=nil, args={})
   api_token = get_admin_api_token
   opts = {
     :path => path_with_action(new_resource.path, action),
-    :data => new_resource.data,
+    :data => args[:data] || new_resource.data,
     :api_token => api_token,
     :referer => node['boxbilling']['config']['url'],
     :debug => new_resource.debug,
@@ -103,6 +120,30 @@ def boxbilling_api_request(action=nil, args={})
   end
 end
 
+def boxbilling_api_request_read(args={})
+  path = filter_path(new_resource.path)
+  if path_supports?(new_resource.path, :get)
+    boxbilling_api_request(:get, args)
+  else # some objects do not support :get, we should use :get_list
+    data_pkeys = get_primary_keys_from_data(new_resource.data)
+    page = 1
+    begin
+      get_list = boxbilling_api_request(:get_list, {
+        :data => {
+          :page => page
+        }
+      })
+      get_list['list'].each do |item|
+        unless data_changed?(get_primary_keys_from_data(item), data_pkeys)
+          return item
+        end
+      end
+      page = page + 1
+    end while page <= get_list['pages']
+    return nil
+  end
+end
+
 action :request do
   converge_by("Request #{new_resource}: #{new_resource.data}") do
     boxbilling_api_request
@@ -110,7 +151,7 @@ action :request do
 end
 
 action :create do
-  read_data = boxbilling_api_request(:get, {
+  read_data = boxbilling_api_request_read({
     :ignore_errors => true,
   })
 
@@ -119,7 +160,7 @@ action :create do
       boxbilling_api_request(:create)
       # run an update after the :create, required by some paths,
       # some values are ignored/not_saved by the create action
-      boxbilling_api_request(:update)
+      boxbilling_api_request(:update) if path_supports?(new_resource.path, :update)
     end
   elsif data_changed?(read_data, new_resource.data)
     converge_by("Update #{new_resource}: #{new_resource.data}") do
@@ -129,7 +170,7 @@ action :create do
 end
 
 action :update do
-  read_data = boxbilling_api_request(:get)
+  read_data = boxbilling_api_request_read
 
   if data_changed?(read_data, new_resource.data)
     converge_by("Update #{new_resource}: #{new_resource.data}") do
@@ -139,7 +180,7 @@ action :update do
 end
 
 action :delete do
-  read_data = boxbilling_api_request(:get, {
+  read_data = boxbilling_api_request_read({
     :ignore_errors => true,
   })
 
