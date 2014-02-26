@@ -58,11 +58,16 @@ end
 #   admin/client/create
 #   admin/currency/create
 #   admin/kb/category_create
+#   admin/system/get_params
 def path_with_action(path, action)
   path = filter_path(path)
-  slashes = path.count('/')
-  joiner = slashes < 2 ? '/' : '_'
-  path + joiner + get_action_for_path(path, action)
+  path_ary = path.split('/')
+  if (path_ary[-1] == 'params')
+    path_ary[0..-2].concat([ "#{action.to_s}_#{path_ary[-1]}" ]).join('/')
+  else
+    joiner = path_ary.count < 3 ? '/' : '_'
+    path + joiner + get_action_for_path(path, action)
+  end
 end
 
 # Some data values needs to be normalized to allow their
