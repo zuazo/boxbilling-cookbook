@@ -185,16 +185,28 @@ end
 
 # set writable directories
 %w{ cache log uploads }.map do |data_dir|
-  ::File.join(node['boxbilling']['dir'], 'bb-data', data_dir)
-end.push(
-  ::File.join(node['boxbilling']['dir'], 'bb-themes', 'boxbilling', 'assets')
-).each do |dir|
-  directory dir do
-    path dir
+  ::File.join('bb-data', data_dir)
+end.concat([
+  ::File.join('bb-themes', 'boxbilling', 'assets'),
+]).each do |dir|
+  directory ::File.join(node['boxbilling']['dir'], dir) do
     owner node['apache']['user']
     group node['apache']['group']
     mode 00750
     action :create
+  end
+end
+
+# set writable files
+[
+  ::File.join('bb-themes', 'boxbilling', 'config', 'settings.html'),
+  ::File.join('bb-themes', 'boxbilling', 'config', 'settings_data.json'),
+].each do |dir|
+  file ::File.join(node['boxbilling']['dir'], dir) do
+    owner node['apache']['user']
+    group node['apache']['group']
+    mode 00640
+    action :touch
   end
 end
 
