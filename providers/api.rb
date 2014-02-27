@@ -71,20 +71,20 @@ def get_primary_keys_from_data(data)
   end
 end
 
-def data_changed?(old, new)
+def data_eql?(old, new)
   case new.class.to_s
   when 'Hash'
-    return true unless old.kind_of?(Hash)
-    new.inject(false) do |res, (key, value)|
-      res || data_changed?(old[key.to_s], value)
+    return false unless old.kind_of?(Hash)
+    new.inject(true) do |res, (key, value)|
+      res && data_eql?(old[key.to_s], value)
     end
   when 'Array'
-    return true unless old.kind_of?(Array)
-    new.inject(false) do |res, (value, i)|
-      res || data_changed?(old[i], value)
+    return false unless old.kind_of?(Array)
+    new.inject(true) do |res, (value, i)|
+      res && data_eql?(old[i], value)
     end
   else
-    normalize_data_value(old) != normalize_data_value(new)
+    normalize_data_value(old) == normalize_data_value(new)
   end
 end
 
@@ -134,7 +134,7 @@ def boxbilling_api_request_read(args={})
         }
       })
       get_list['list'].each do |item|
-        unless data_changed?(get_primary_keys_from_data(item), data_pkeys)
+        if data_eql?(get_primary_keys_from_data(item), data_pkeys)
           return item
         end
       end
@@ -162,7 +162,7 @@ action :create do
       # some values are ignored/not_saved by the create action
       boxbilling_api_request(:update) if path_supports?(new_resource.path, :update)
     end
-  elsif data_changed?(read_data, new_resource.data)
+  elsif !data_eql?(read_data, new_resource.data)
     converge_by("Update #{new_resource}: #{new_resource.data}") do
       boxbilling_api_request(:update)
     end
@@ -172,7 +172,7 @@ end
 action :update do
   read_data = boxbilling_api_request_read
 
-  if data_changed?(read_data, new_resource.data)
+  unless data_eql?(read_data, new_resource.data)
     converge_by("Update #{new_resource}: #{new_resource.data}") do
       boxbilling_api_request(:update)
     end
