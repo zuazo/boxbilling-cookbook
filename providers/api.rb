@@ -162,9 +162,20 @@ action :create do
       # some values are ignored/not_saved by the create action
       boxbilling_api_request(:update) if path_supports?(new_resource.path, :update)
     end
+  # data exists, update
   elsif !data_eql?(read_data, new_resource.data)
-    converge_by("Update #{new_resource}: #{new_resource.data}") do
-      boxbilling_api_request(:update)
+    if path_supports?(new_resource.path, :update)
+      converge_by("Update #{new_resource}: #{new_resource.data}") do
+        boxbilling_api_request(:update)
+      end
+    # doesn't support update, use delete and then create
+    else
+      converge_by("Delete #{new_resource}: #{new_resource.data}") do
+        boxbilling_api_request(:delete)
+      end
+      converge_by("Create #{new_resource}: #{new_resource.data}") do
+        boxbilling_api_request(:create)
+      end
     end
   end
 end
