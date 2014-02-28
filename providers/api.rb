@@ -80,7 +80,7 @@ def data_eql?(old, new)
     end
   when 'Array'
     return false unless old.kind_of?(Array)
-    new.inject(true) do |res, (value, i)|
+    new.each.with_index.inject(true) do |res, (value, i)|
       res && data_eql?(old[i], value)
     end
   else
