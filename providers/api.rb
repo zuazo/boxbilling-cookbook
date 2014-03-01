@@ -34,6 +34,13 @@ def get_action_for_path(path, action)
     else
       action
     end
+  when :update
+    case path
+    when 'admin/extension/config'
+      :save
+    else
+      action
+    end
   else
     action
   end.to_s
