@@ -75,9 +75,9 @@ end
 
 execute 'install ioncube' do
   command <<-EOF
-    cd $(php -i | grep extension_dir | awk '{print $NF}') &&
+    cd "$(php -i | awk '$1 == "extension_dir" {print $NF}')" &&
     tar xfz '#{ioncube_file}' --strip-components=1 --no-same-owner --wildcards --no-anchored '*.so' &&
-    echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | egrep -o "[0-9]\.[0-9]+" | head -1).so" > "#{node['php']['ext_conf_dir']}/20ioncube.ini"
+    echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | grep -m 1 -o '[0-9][.][0-9][0-9]*').so" > '#{node['php']['ext_conf_dir']}/20ioncube.ini'
     EOF
   creates ::File.join(node['php']['ext_conf_dir'], '20ioncube.ini')
 end
@@ -129,7 +129,7 @@ remote_file 'download boxbilling' do
 end
 
 execute 'extract boxbilling' do
-  command "unzip -q -u -o #{local_file} -d #{node['boxbilling']['dir']}"
+  command "unzip -q -u -o '#{local_file}' -d '#{node['boxbilling']['dir']}'"
   creates ::File.join(node['boxbilling']['dir'], 'index.php')
 end
 
