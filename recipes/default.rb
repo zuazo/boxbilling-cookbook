@@ -77,7 +77,7 @@ execute 'install ioncube' do
   command <<-EOF
     cd "$(php -i | awk '$1 == "extension_dir" {print $NF}')" &&
     tar xfz '#{ioncube_file}' --strip-components=1 --no-same-owner --wildcards --no-anchored '*.so' &&
-    echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | grep -m 1 -o '[0-9][.][0-9][0-9]*').so" > '#{node['php']['ext_conf_dir']}/20ioncube.ini'
+    echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | grep -o '[0-9][.][0-9][0-9]*' | head -1).so" > '#{node['php']['ext_conf_dir']}/20ioncube.ini'
     EOF
   creates ::File.join(node['php']['ext_conf_dir'], '20ioncube.ini')
 end
