@@ -217,7 +217,7 @@ file 'bb-config.php' do
   group node['apache']['group']
   mode 00640
   action :create_if_missing
-  notifies :restart, "service[apache2]", :immediately
+  notifies :restart, 'service[apache2]', :immediately
   notifies :create, 'ruby_block[run setup]', :immediately
 end
 
