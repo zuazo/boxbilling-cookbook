@@ -17,7 +17,7 @@ default['boxbilling']['server_name'] = node['fqdn']
 default['boxbilling']['server_aliases'] = nil
 default['boxbilling']['cron_enabled'] = true
 
-default['boxbilling']['ssl'] = false
+default['boxbilling']['ssl'] = true
 
 default['boxbilling']['admin']['name'] = 'Admin'
 default['boxbilling']['admin']['email'] = "admin@#{node['boxbilling']['server_name']}"

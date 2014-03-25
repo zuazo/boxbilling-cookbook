@@ -162,6 +162,9 @@ end
 
 # Enable ssl
 if node['boxbilling']['ssl']
+  Chef::Recipe.send(:include, Chef::SSL::RecipeHelpers)
+  cert = generate_certificate('boxbilling')
+
   include_recipe 'apache2::mod_ssl'
 
   # Create SSL virtualhost
@@ -171,9 +174,8 @@ if node['boxbilling']['ssl']
     server_name node['boxbilling']['server_name']
     server_aliases node['boxbilling']['server_aliases']
     port '443'
-    # TODO: assign SSL certificate
-    ssl_key nil
-    ssl_cert nil
+    ssl_key cert.key_path
+    ssl_cert cert.cert_path
     allow_override 'All'
     enable true
   end
