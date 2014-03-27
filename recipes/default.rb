@@ -162,8 +162,10 @@ end
 
 # Enable ssl
 if node['boxbilling']['ssl']
-  Chef::Recipe.send(:include, Chef::SSL::RecipeHelpers)
-  cert = generate_certificate('boxbilling')
+  cert = ssl_certificate 'boxbilling' do
+    namespace node['boxbilling']
+    notifies :restart, 'service[apache2]'
+  end
 
   include_recipe 'apache2::mod_ssl'
 
