@@ -34,13 +34,35 @@ end
 if Chef::Config[:solo]
   if node['boxbilling']['config']['db_password'].nil?
     Chef::Application.fatal!('You must set boxbilling\'s database password in chef-solo mode.')
+  else
+    db_password = node['boxbilling']['config']['db_password']
   end
   if node['boxbilling']['admin']['pass'].nil?
     Chef::Application.fatal!('You must set boxbilling\'s admin password in chef-solo mode.')
+  else
+    admin_pass = node['boxbilling']['admin']['pass']
   end
 else
-  node.set_unless['boxbilling']['config']['db_password'] = secure_password
-  node.set_unless['boxbilling']['admin']['pass'] = secure_password
+  include_recipe 'encrypted_attributes'
+
+  # generate db_password
+  if Chef::EncryptedAttribute.exists?(node['boxbilling']['config']['db_password'])
+    Chef::EncryptedAttribute.update(node.set['boxbilling']['config']['db_password'])
+    db_password = Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
+  else
+    db_password = secure_password
+    node.set['boxbilling']['config']['db_password'] = Chef::EncryptedAttribute.create(db_password)
+  end
+
+  # generate admin_pass
+  if Chef::EncryptedAttribute.exists?(node['boxbilling']['admin']['pass'])
+    Chef::EncryptedAttribute.update(node.set['boxbilling']['admin']['pass'])
+    admin_pass = Chef::EncryptedAttribute.load(node['boxbilling']['admin']['pass'])
+  else
+    admin_pass = secure_password
+    node.set['boxbilling']['admin']['pass'] = Chef::EncryptedAttribute.create(admin_pass)
+  end
+
   node.save
 end
 
@@ -87,13 +109,13 @@ end
 #==============================================================================
 
 if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
-  include_recipe 'mysql::server'
+  include_recipe 'boxbilling::mysql'
   include_recipe 'database::mysql'
 
   mysql_connection_info = {
     :host => 'localhost',
     :username => 'root',
-    :password => node['mysql']['server_root_password']
+    :password => Chef::EncryptedAttribute.load(node['boxbilling']['mysql']['server_root_password']),
   }
 
   mysql_database node['boxbilling']['config']['db_name'] do
@@ -105,7 +127,7 @@ if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
     connection mysql_connection_info
     database_name node['boxbilling']['config']['db_name']
     host 'localhost'
-    password node['boxbilling']['config']['db_password']
+    password db_password
     privileges [:all]
     action :grant
   end
@@ -233,10 +255,10 @@ ruby_block 'run setup' do
       :db_host => node['boxbilling']['config']['db_host'],
       :db_name => node['boxbilling']['config']['db_name'],
       :db_user => node['boxbilling']['config']['db_user'],
-      :db_pass => node['boxbilling']['config']['db_password'],
+      :db_pass => db_password,
       :admin_name => node['boxbilling']['admin']['name'],
       :admin_email => node['boxbilling']['admin']['email'],
-      :admin_pass => node['boxbilling']['admin']['pass'],
+      :admin_pass => admin_pass,
       :license => node['boxbilling']['config']['license']
     })
   end
@@ -262,7 +284,7 @@ template 'bb-config.php' do
     :db_host => node['boxbilling']['config']['db_host'],
     :db_name => node['boxbilling']['config']['db_name'],
     :db_user => node['boxbilling']['config']['db_user'],
-    :db_password => node['boxbilling']['config']['db_password'],
+    :db_password => db_password,
     :url => node['boxbilling']['config']['url'],
     :license => node['boxbilling']['config']['license'],
     :locale => node['boxbilling']['config']['locale'],

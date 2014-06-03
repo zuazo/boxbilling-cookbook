@@ -33,3 +33,7 @@ default['boxbilling']['config']['license'] = nil
 default['boxbilling']['config']['locale'] = 'en_US'
 default['boxbilling']['config']['sef_urls'] = false
 default['boxbilling']['config']['debug'] = false
+
+default['boxbilling']['mysql']['server_root_password'] = nil
+default['boxbilling']['mysql']['server_debian_password'] = nil
+default['boxbilling']['mysql']['server_repl_password'] = nil
