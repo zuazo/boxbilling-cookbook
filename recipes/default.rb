@@ -44,6 +44,7 @@ if Chef::Config[:solo]
   end
 else
   include_recipe 'encrypted_attributes'
+  require 'chef-encrypted-attributes'
 
   # generate db_password
   if Chef::EncryptedAttribute.exists?(node['boxbilling']['config']['db_password'])
