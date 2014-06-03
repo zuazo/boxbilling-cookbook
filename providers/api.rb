@@ -4,6 +4,7 @@ def whyrun_supported?
 end
 
 def get_admin_api_token
+  require 'chef-encrypted-attributes'
   db = BoxBilling::Database.new({
     :database => node['boxbilling']['config']['db_name'],
     :user     => node['boxbilling']['config']['db_user'],
