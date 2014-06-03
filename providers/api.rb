@@ -4,11 +4,16 @@ def whyrun_supported?
 end
 
 def get_admin_api_token
-  require 'chef-encrypted-attributes'
+  password = if Chef::Config[:solo]
+    node['boxbilling']['config']['db_password']
+  else
+    require 'chef-encrypted-attributes'
+    Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
+  end
   db = BoxBilling::Database.new({
     :database => node['boxbilling']['config']['db_name'],
     :user     => node['boxbilling']['config']['db_user'],
-    :password => Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password']),
+    :password => password,
   })
   db.get_admin_api_token || begin
     db.generate_admin_api_token

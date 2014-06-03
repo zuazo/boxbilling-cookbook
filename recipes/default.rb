@@ -44,7 +44,6 @@ if Chef::Config[:solo]
   end
 else
   include_recipe 'encrypted_attributes'
-  require 'chef-encrypted-attributes'
 
   # generate db_password
   if Chef::EncryptedAttribute.exists?(node['boxbilling']['config']['db_password'])
@@ -109,6 +108,14 @@ end
 # Install MySQL
 #==============================================================================
 
+def server_root_password
+  if Chef::Config[:solo]
+    node['boxbilling']['mysql']['server_root_password']
+  else
+    Chef::EncryptedAttribute.load(node['boxbilling']['mysql']['server_root_password'])
+  end
+end
+
 if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
   include_recipe 'boxbilling::mysql'
   include_recipe 'database::mysql'
@@ -116,7 +123,7 @@ if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
   mysql_connection_info = {
     :host => 'localhost',
     :username => 'root',
-    :password => Chef::EncryptedAttribute.load(node['boxbilling']['mysql']['server_root_password']),
+    :password => server_root_password,
   }
 
   mysql_database node['boxbilling']['config']['db_name'] do
