@@ -71,7 +71,7 @@ def path_with_action(path, action)
 end
 
 # Some data values needs to be normalized to allow their
-# comparation to work as expected
+# comparison to work as expected
 def normalize_data_value(v)
   v = v.to_s
   v.gsub(/^([0-9]+)[.]0+$/, '\1') # remove 0 decimals
