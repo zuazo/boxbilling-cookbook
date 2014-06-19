@@ -32,11 +32,11 @@ def mysql_password(user)
 
     if Chef::EncryptedAttribute.exists?(node['boxbilling']['mysql'][key])
       Chef::EncryptedAttribute.update(node.set['boxbilling']['mysql'][key])
-      Chef::EncryptedAttribute.load(node['boxbilling']['mysql'][key])
+      password = Chef::EncryptedAttribute.load(node['boxbilling']['mysql'][key])
     else
       password = secure_password
       node.set['boxbilling']['mysql'][key] = Chef::EncryptedAttribute.create(password)
-      password
+      node.save
     end
 
   end
