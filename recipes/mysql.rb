@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-include_recipe 'mysql::server'
-
 Chef::Recipe.send(:include, Opscode::OpenSSL::Password) # include the #secure_password method
 
 def mysql_password(user)
