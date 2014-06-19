@@ -37,6 +37,7 @@ def mysql_password(user)
       password = secure_password
       node.set['boxbilling']['mysql'][key] = Chef::EncryptedAttribute.create(password)
       node.save
+      password
     end
 
   end
