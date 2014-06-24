@@ -2,7 +2,7 @@
 module BoxBilling
   module RecipeHelpers
 
-    def self.boxbilling_upload_cookbook_file(file)
+    def boxbilling_upload_cookbook_file(file)
       path = ::File.join(node['boxbilling']['dir'], 'bb-uploads', file)
 
       # Upload product images
@@ -16,7 +16,7 @@ module BoxBilling
       "#{node['boxbilling']['config']['url']}/bb-uploads/#{file}"
     end
 
-    def self.boxbilling_setup(host, params)
+    def boxbilling_setup(host, params)
       uri = URI.parse('http://localhost/install/index.php?a=install')
       http = Net::HTTP.new(uri.host)
       request = Net::HTTP::Post.new(uri.request_uri)
