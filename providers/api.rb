@@ -44,8 +44,6 @@ def get_action_for_path(path, action)
     case path
     when 'admin/extension/config'
       :save
-    when 'admin/staff/password'
-      :change
     else
       action
     end
