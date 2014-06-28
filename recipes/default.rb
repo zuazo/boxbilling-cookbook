@@ -258,7 +258,7 @@ end
 # install BoxBilling
 ruby_block 'run setup' do
   block do
-    ::Chef::Recipe.send(:include, ::BoxBilling::RecipeHelpers)
+    self.class.send(:include, ::BoxBilling::RecipeHelpers)
 
     boxbilling_setup(node['boxbilling']['server_name'], {
       :agree => '1',
