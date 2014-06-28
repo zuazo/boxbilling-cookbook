@@ -121,7 +121,7 @@ def boxbilling_api_request(action=nil, args={})
     :debug => new_resource.debug,
   }
 
-  if args[:ignore_errors].nil? ? new_resource.ignore_errors : args[:ignore_errors]
+  if args[:ignore_failure].nil? ? new_resource.ignore_failure : args[:ignore_failure]
     begin
       BoxBilling::API.request(opts)
     rescue Exception => e
@@ -165,7 +165,7 @@ end
 
 action :create do
   read_data = boxbilling_api_request_read({
-    :ignore_errors => true,
+    :ignore_failure => true,
   })
 
   if read_data.nil?
@@ -205,7 +205,7 @@ end
 
 action :delete do
   read_data = boxbilling_api_request_read({
-    :ignore_errors => true,
+    :ignore_failure => true,
   })
 
   unless read_data.nil?
