@@ -17,8 +17,6 @@
 # limitations under the License.
 #
 
-::Chef::Recipe.send(:include, ::BoxBilling::RecipeHelpers)
-
 #==============================================================================
 # Install packages needed by the recipe
 #==============================================================================
@@ -260,6 +258,8 @@ end
 # install BoxBilling
 ruby_block 'run setup' do
   block do
+    ::Chef::Recipe.send(:include, ::BoxBilling::RecipeHelpers)
+
     boxbilling_setup(node['boxbilling']['server_name'], {
       :agree => '1',
       :db_host => node['boxbilling']['config']['db_host'],
