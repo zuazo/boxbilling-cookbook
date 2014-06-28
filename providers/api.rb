@@ -84,6 +84,8 @@ def get_primary_keys_from_data(data)
   end
 end
 
+# Compares each new value with the old one. Old values that do not
+# exists in new are ignored.
 def data_eql?(old, new)
   case new.class.to_s
   when 'Hash'
