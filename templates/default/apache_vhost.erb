@@ -7,8 +7,10 @@
   ServerAlias <% @params[:server_aliases].each do |a| %><%= a %> <% end %>
 <% end -%>
   DocumentRoot <%= @params[:docroot] %>
-<% @params[:headers].each do |header, value| -%>
+<% [@params[:headers]].flatten.each do |headers| -%>
+<%   headers.each do |header, value| -%>
   Header set <%= header %> "<%= value %>"
+<%   end -%>
 <% end -%>
 
   <Directory <%= @params[:docroot] %>>
