@@ -7,6 +7,9 @@
   ServerAlias <% @params[:server_aliases].each do |a| %><%= a %> <% end %>
 <% end -%>
   DocumentRoot <%= @params[:docroot] %>
+<% @params[:headers].each do |header, value| -%>
+  Header set <%= header %> "<%= value %>"
+<% end -%>
 
   <Directory <%= @params[:docroot] %>>
     Options <%= [@params[:directory_options] || "FollowSymLinks" ].flatten.join " " %>

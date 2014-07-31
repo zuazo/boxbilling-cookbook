@@ -185,6 +185,7 @@ web_app 'boxbilling' do
   docroot node['boxbilling']['dir']
   server_name node['boxbilling']['server_name']
   server_aliases node['boxbilling']['server_aliases']
+  headers node['boxbilling']['headers']
   port '80'
   allow_override 'All'
   enable true
@@ -205,6 +206,7 @@ if node['boxbilling']['ssl']
     docroot node['boxbilling']['dir']
     server_name node['boxbilling']['server_name']
     server_aliases node['boxbilling']['server_aliases']
+    headers node['boxbilling']['headers']
     port '443'
     ssl_key cert.key_path
     ssl_cert cert.cert_path
