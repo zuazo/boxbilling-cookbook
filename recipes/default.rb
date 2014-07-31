@@ -303,6 +303,20 @@ template 'bb-config.php' do
   )
 end
 
+# create api configuration file
+if node['boxbilling']['api_config']
+  template 'api-config.php' do
+    path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api', 'api-config.php')
+    source 'api-config.php.erb'
+    owner node['apache']['user']
+    group node['apache']['group']
+    mode 00640
+    variables(
+      config: node['boxbilling']['api_config']
+    )
+  end
+end
+
 # create htaccess file
 template '.htaccess' do
   path ::File.join(node['boxbilling']['dir'], '.htaccess')

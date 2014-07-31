@@ -34,6 +34,12 @@ default['boxbilling']['config']['locale'] = 'en_US'
 default['boxbilling']['config']['sef_urls'] = false
 default['boxbilling']['config']['debug'] = false
 
+default['boxbilling']['api_config']['enabled'] = true
+default['boxbilling']['api_config']['require_referer_header'] = true
+default['boxbilling']['api_config']['allowed_ips'] = []
+default['boxbilling']['api_config']['rate_span'] = 60 * 60
+default['boxbilling']['api_config']['rate_limit'] = 1000
+
 default['boxbilling']['mysql']['server_root_password'] = nil
 default['boxbilling']['mysql']['server_debian_password'] = nil
 default['boxbilling']['mysql']['server_repl_password'] = nil
