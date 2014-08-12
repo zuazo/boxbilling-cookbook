@@ -1,6 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 source 'https://rubygems.org'
 
-gem 'vagrant' , :git => 'git://github.com/mitchellh/vagrant.git', :branch => 'v1.2.2'
-gem 'berkshelf', '~> 2.0'
-gem 'test-kitchen', '~> 1.0'
-gem 'kitchen-vagrant', '~> 0.11.0'
+group :test, :development do
+  gem 'rake'
+  gem 'rspec', '~> 3.0'
+end
+
+group :test do
+  gem 'berkshelf', '~> 2.0'
+  gem 'chefspec', '~> 4.0'
+  gem 'foodcritic', '~> 4.0'
+end
+
+group :integration, :kitchen do
+  gem 'vagrant', github: 'mitchellh/vagrant'
+  gem 'test-kitchen', '~> 1.2'
+  gem 'kitchen-vagrant', '~> 0.10'
+end
+
+group :integration_cloud, :kitchen_cloud do
+  gem 'kitchen-ec2', '~> 0.8'
+  gem 'kitchen-digitalocean', '~> 0.7'
+end

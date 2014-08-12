@@ -5,7 +5,7 @@ module BoxBilling
     ADMIN_SQL_WHERE = {
       :role => 'admin',
       :status => 'active'
-    }
+    } unless defined?(::BoxBilling::Database::ADMIN_SQL_WHERE)
 
     def initialize(options={})
       @conn_string = options

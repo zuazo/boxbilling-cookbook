@@ -254,11 +254,11 @@ file 'bb-config.php' do
   mode 00640
   action :create_if_missing
   notifies :restart, 'service[apache2]', :immediately
-  notifies :create, 'ruby_block[run setup]', :immediately
+  notifies :create, 'ruby_block[run boxbilling setup]', :immediately
 end
 
 # install BoxBilling
-ruby_block 'run setup' do
+ruby_block 'run boxbilling setup' do
   block do
     self.class.send(:include, ::BoxBilling::RecipeHelpers)
 
@@ -306,21 +306,20 @@ template 'bb-config.php' do
 end
 
 # create api configuration file
-if node['boxbilling']['api_config']
-  template 'api-config.php' do
-    path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api', 'api-config.php')
-    source 'api-config.php.erb'
-    owner node['apache']['user']
-    group node['apache']['group']
-    mode 00640
-    variables(
-      config: node['boxbilling']['api_config']
-    )
-  end
+template 'api-config.php' do
+  path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api', 'api-config.php')
+  source 'api-config.php.erb'
+  owner node['apache']['user']
+  group node['apache']['group']
+  mode 00640
+  variables(
+    config: node['boxbilling']['api_config']
+  )
+  only_if { node['boxbilling']['api_config'] }
 end
 
 # create htaccess file
-template '.htaccess' do
+template 'boxbilling .htaccess' do
   path ::File.join(node['boxbilling']['dir'], '.htaccess')
   source 'htaccess.erb'
   owner node['apache']['user']
