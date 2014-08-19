@@ -1,68 +1,726 @@
-boxbilling Cookbook
-===================
-TODO: Enter the cookbook description here.
+Description
+===========
+[![Cookbook Version](https://img.shields.io/cookbook/v/boxbilling.svg?style=flat)](https://supermarket.getchef.com/cookbooks/boxbilling)
+[![Dependency Status](http://img.shields.io/gemnasium/onddo/boxbilling-cookbook.svg?style=flat)](https://gemnasium.com/onddo/boxbilling-cookbook)
+[![Build Status](http://img.shields.io/travis/onddo/boxbilling-cookbook.svg?style=flat)](https://travis-ci.org/onddo/boxbilling-cookbook)
 
-e.g.
-This cookbook makes your favorite breakfast sandwhich.
+Chef cookbook to install and configure [BoxBilling](http://www.boxbilling.com/), invoice and client management software.
 
 Requirements
-------------
-TODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.
+============
 
-e.g.
-#### packages
-- `toaster` - boxbilling needs toaster to brown your bagel.
+## Supported Platforms
+
+This cookbook has been tested on the following platforms:
+
+* CentOS
+* Ubuntu
+
+Please, [let us know](https://github.com/onddo/boxbilling-cookbook/issues/new?title=I%20have%20used%20it%20successfully%20on%20...) if you use it successfully on any other platform.
+
+## Required Cookbooks
+
+* [apache2](https://supermarket.getchef.com/cookbooks/apache2)
+* [database](https://supermarket.getchef.com/cookbooks/database)
+* [encrypted_attributes](https://supermarket.getchef.com/cookbooks/encrypted_attributes)
+* [mysql (~> 5.0)](https://supermarket.getchef.com/cookbooks/mysql)
+* [openssl](https://supermarket.getchef.com/cookbooks/openssl)
+* [php](https://supermarket.getchef.com/cookbooks/php)
+* [ssl_certificate](https://supermarket.getchef.com/cookbooks/ssl_certificate)
+* [yum-epel](https://supermarket.getchef.com/cookbooks/yum-epel)
+
+## Required Applications
+
+* Ruby `1.9.3` or higher.
 
 Attributes
-----------
-TODO: List you cookbook attributes here.
+==========
 
-e.g.
-#### boxbilling::default
 <table>
   <tr>
-    <th>Key</th>
-    <th>Type</th>
+    <th>Attribute</th>
     <th>Description</th>
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['boxbilling']['bacon']</tt></td>
-    <td>Boolean</td>
-    <td>whether to include bacon</td>
-    <td><tt>true</tt></td>
+    <td><code>node["boxbilling"]["download_url"]</code></td>
+    <td>BoxBilling download URL.</td>
+    <td><code>"http://www.boxbilling.com/version/latest.zip"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["required_packages"]</code></td>
+    <td>BoxBilling required packages.</td>
+    <td><code>%w(unzip)</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["php_packages"]</code></td>
+    <td>BoxBilling required PHP packages.</td>
+    <td><em>calculated</em></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["dir"]</code></td>
+    <td>BoxBilling installation directory.</td>
+    <td><code>"/srv/www/boxbilling"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["server_name"]</code></td>
+    <td>BoxBilling server name.</td>
+    <td><code>node["fqdn"]</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["cron_enabled"]</code></td>
+    <td>Whether to enable BoxBilling cron job.</td>
+    <td><code>true</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["headers"]</code></td>
+    <td>BoxBilling HTTP headers to set as hash.</td>
+    <td><code>{}</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["ssl"]</code></td>
+    <td>Whether to enable SSL in BoxBilling.</td>
+    <td><code>true</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["admin"]["name"]</code></td>
+    <td>BoxBilling admin user name.</td>
+    <td><code>"Admin"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["admin"]["email"]</code></td>
+    <td>BoxBilling admin email.</td>
+    <td><code>"admin@#{node['boxbilling']['server_name']}"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["admin"]["pass"]</code></td>
+    <td>BoxBilling admin password.</td>
+    <td><em>calculated</em></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["timezone"]</code></td>
+    <td>BoxBilling timezone. See <a href="http://php.net/manual/en/timezones.php">PHP supported timezones</a>.</td>
+    <td><code>"America/New_York"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["db_host"]</code></td>
+    <td>BoxBilling database host.</td>
+    <td><code>"localhost"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["db_name"]</code></td>
+    <td>BoxBilling database name.</td>
+    <td><code>"boxbilling"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["db_user"]</code></td>
+    <td>BoxBilling database user.</td>
+    <td><code>"boxbilling"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["db_password"]</code></td>
+    <td>BoxBilling database user password.</td>
+    <td><em>calculated</em></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["url"]</code></td>
+    <td>BoxBilling URL.</td>
+    <td><em>calculated</em></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["license"]</code></td>
+    <td>BoxBilling license key (<strong>required</strong>). Go to <a href="http://www.boxbilling.com/order">BoxBilling order page</a> to get a new license.</td>
+    <td><code>nil</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["locale"]</code></td>
+    <td>BoxBilling locale.</td>
+    <td><code>"en_US"</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["sef_urls"]</code></td>
+    <td>Whether to enable BoxBilling <em>search engine friendly</em> URLs.</td>
+    <td><code>false</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["config"]["debug"]</code></td>
+    <td>Whether to enable BoxBilling debug mode.</td>
+    <td><code>false</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["api_config"]["enabled"]</code></td>
+    <td>Whether to generate API configuration file (<em>api-config.php</em>).</td>
+    <td><code>true</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["api_config"]["require_referer_header"]</code></td>
+    <td>Whether to enable <em>require referer header</em> in the API.</td>
+    <td><code>true</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["api_config"]["allowed_ips"]</code></td>
+    <td>BoxBilling allowed IP addresses to access the API. Empty array will allow all IPs to access the API.</td>
+    <td><code>[]</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["api_config"]["rate_span"]</code></td>
+    <td>BoxBilling API time span for limit in seconds.</td>
+    <td><code>3600</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["api_config"]["rate_limit"]</code></td>
+    <td>BoxBilling API requests allowed per time span.</td>
+    <td><code>1000</code></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["mysql"]["server_root_password"]</code></td>
+    <td>BoxBilling MySQL root password.</td>
+    <td><em>calculated</em></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["mysql"]["server_debian_password"]</code></td>
+    <td>BoxBilling MySQL debian user password.</td>
+    <td><em>calculated</em></td>
+  </tr>
+  <tr>
+    <td><code>node["boxbilling"]["mysql"]["server_repl_password"]</code></td>
+    <td>BoxBilling MySQL repl user password.</td>
+    <td><em>calculated</em></td>
+  </tr>
+</table>
+
+## The HTTPS Certificate
+
+This cookbook uses the [`ssl_certificate`](https://supermarket.getchef.com/cookbooks/ssl_certificate) cookbook to create the HTTPS certificate. The namespace used is `node["boxbilling"]`. See the [`ssl_certificate` namespace documentation](https://supermarket.getchef.com/cookbooks/ssl_certificate#namespaces) for more information.
+
+Recipes
+=======
+
+## boxbilling::default
+
+Installs and configures BoxBilling.
+
+## boxbilling::api
+
+Installs the requirementes to use `boxbilling_api` resource.
+
+## boxbilling::mysql
+
+Installs MySQL server for BoxBilling.
+
+Resources
+=========
+
+## boxbilling_api[path]
+
+This resource uses the [BoxBilling v2 Admin API](http://www.boxbilling.com/docs/api-admin.html) with some modifications:
+
+* Some paths has been normalized, the action has been removed from the path and the resource action is issued instead.
+* The *update* action is simulated for some objects that do not support it, using *delete* and *create*.
+* All the action names has been simplified to *create*, *update* and *delete*.
+
+**Note:** Keep in mind that some API calls require self-generated/auto-incremented MySQL identifiers. So its use can become complicated sometimes.
+
+## boxbilling_api Actions
+
+* `request` (*default*): Sends a HTTP raw API request.
+* `create`: Sends a create action to the API object.
+* `update`: Sends an update action to the API object.
+* `delete`: Send a delete action to the API object.
+
+## boxbilling_api Parameters
+
+<table>
+  <tr>
+    <th>Parameter</th>
+    <th>Description</th>
+    <th>Default</th>
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>BoxBilling API relative path. For example: <code>"admin/product"</code>.</td>
+    <td><em>name</em></td>
+  </tr>
+  <tr>
+    <td>data</td>
+    <td>Data to send as hash.</td>
+    <td><code>{}</code></td>
+  </tr>
+  <tr>
+    <td>debug</td>
+    <td>Whether to enable debug mode.</td>
+    <td><code>false</code></td>
+  </tr>
+  <tr>
+    <td>ignore_failure</td>
+    <td>Ignore API HTTP errors.</td>
+    <td><code>false</code></td>
   </tr>
 </table>
 
 Usage
------
-#### boxbilling::default
-TODO: Write usage instructions for each cookbook.
+=====
 
-e.g.
-Just include `boxbilling` in your node's `run_list`:
+You need a valid BoxBilling license key to use this cookbook. You can get a new license in the [BoxBilling order page](http://www.boxbilling.com/order).
+
+## Including in a Cookbook Recipe
+
+You can simply include it in a recipe:
+
+```ruby
+# in your recipe
+node.default["boxbilling"]["config"]["license"] = "..." # BB_LICENSE key
+include_recipe "boxbilling"
+```
+
+Don't forget to include the `boxbilling` cookbook as a dependency in the metadata:
+
+```ruby
+# metadata.rb
+depends "boxbilling"
+```
+
+## Including in the Run List
+
+Another alternative is to include it in your *Run List*:
 
 ```json
 {
-  "name":"my_node",
+  "name": "bb.onddo.com",
+  [...]
+  "normal": {
+    "boxbilling": {
+      "config": {
+        "license": "BB_LICENSE"
+      }
+    }
+  },
   "run_list": [
+    [...]
     "recipe[boxbilling]"
   ]
 }
 ```
 
+## *boxbilling::default* Recipe Usage Example
+
+```ruby
+node.default["boxbilling"]["config"]["license"] = "..." # BB_LICENSE key
+include_recipe "boxbilling::default"
+```
+
+## *boxbilling::api* Recipe Usage Example
+
+```ruby
+include_recipe "boxbilling::api"
+```
+
+## *boxbilling::mysql* Recipe Usage Example
+
+```ruby
+include_recipe "boxbilling::mysql"
+```
+
+## *boxbilling_api* Resource Usage Example
+
+Below is a fairly complete real example:
+
+```ruby
+# =============================================================================
+# Products
+# =============================================================================
+
+# Disable "Domains registration and transfer" product
+boxbilling_api "admin/product Domains registration and transfer" do
+  path "admin/product"
+  data ({
+    :id => 1,
+    :status => "disabled",
+  })
+  action :update
+end
+
+# =============================================================================
+# News
+# =============================================================================
+
+# Delete some default blog news
+(1..3).each do |id|
+  boxbilling_api "admin/news delete #{id}" do
+    path "admin/news"
+    data ({
+      :id => id,
+    })
+    action :delete
+  end
+end
+
+# New blog post
+# boxbilling_api "admin/news" do
+#   data ({
+#     :id => 4,
+#     :content => "Blog post content...",
+#     :title => "My first blog post",
+#     # :image => "http://www.yourdomain.com/image.jpg",
+#     :status => "active",
+#     # :created_at => "2012-01-01",
+#     # :updated_at => "2012-01-01",
+#   })
+#   action :create
+# end
+
+# =============================================================================
+# Knowledge Base
+# =============================================================================
+
+# Disable some default articles
+(1..3).each do |id|
+  boxbilling_api "admin/kb/article #{id}" do
+    path "admin/kb/article"
+    data ({
+      :id => id,
+      :status => "draft",
+    })
+    action :update
+  end
+end
+
+# Create some categories
+# boxbilling_api "admin/kb/category 3" do
+#   path "admin/kb/category"
+#   data ({
+#     :id => 3,
+#     :title => "New KB category",
+#     :description => "New KB category content description",
+#   })
+#   action :create
+# end
+
+# Add some articles
+# boxbilling_api "admin/kb/article 4" do
+#   path "admin/kb/article"
+#   data ({
+#     :id => 4,
+#     :kb_article_category_id => 3,
+#     :title => "My New Article",
+#     :status => "active",
+#     :content => "My article content...",
+#   })
+#   action :create
+# end
+
+# =============================================================================
+# Configuration > Settings > Client
+# =============================================================================
+
+boxbilling_api "admin/extension/config" do
+  data({
+    :ext => "mod_client",
+    :allow_signup => 1,
+    :require_email_confirmation => 1,
+    :allow_change_email => 1,
+    :required => %w{
+      last_name
+      country
+      city
+      state
+      address_1
+      postcode
+      phone
+    }
+  })
+  action :update
+end
+
+# =============================================================================
+# Configuration > Settings > Currency settings
+# =============================================================================
+
+boxbilling_api "admin/currency EUR" do
+  path "admin/currency"
+  data ({
+    :code => "EUR",
+    :title => "Euro",
+    :format => "{{price}} \u20AC",
+  })
+  action :create
+end
+
+boxbilling_api "admin/currency GBP" do
+  path "admin/currency"
+  data ({
+    :code => "GBP",
+    :title => "Pound Sterling",
+    :format => "\u00A3{{price}}",
+  })
+  action :create
+end
+
+boxbilling_api "admin/currency/set_default" do
+  data ({
+    :code => "EUR"
+  })
+end
+
+# =============================================================================
+# Configuration > Settings > Email
+# =============================================================================
+
+boxbilling_api "admin/email/batch_template_generate"
+
+# Reset a template
+# boxbilling_api "admin/email/template_reset mod_client_password_reset_approve" do
+#   path "admin/email/template_reset"
+#   data ({
+#     :code => "mod_client_password_reset_approve"
+#   })
+# end
+
+# Create a new template
+# boxbilling_api "admin/email/template 1" do
+#   path "admin/email/template"
+#   data ({
+#     :id => 1,
+#     :enabled => 1,
+#     :category => "client",
+#     :action_code => "mod_client_password_reset_approve",
+#     :subject => "[{{ guest.system_company.name }}] Password Changed",
+#     :content => "..."
+#   })
+#   action :create
+# end
+
+# Update an existing template
+# boxbilling_api "admin/email/template 1" do
+#   path "admin/email/template"
+#   data ({
+#     :id => 1,
+#     :enabled => 1,
+#     :subject => "[{{ guest.system_company.name }}] Password Changed",
+#     :content => <<-EOF
+# {% filter markdown %}
+# 
+# Dear {{ c.first_name }} {{ c.last_name }},
+# 
+# As you requested, your password for our client area has now been reset.
+# Your new login details are as follows:
+# 
+# Login at: {{"login"|link}}?email={{ c.email }}
+# Email: {{ c.email }}
+# Password: {{ password }}
+# 
+# To change your password to something more memorable, after logging in go to 
+# Profile &gt; Change Password.
+# 
+# Edit your profile at {{ "me"|link }}
+# 
+# {{ guest.system_company.signature }}
+# 
+# {% endfilter %}
+#     EOF
+#   })
+#   action :update
+# end
+
+# Email settings
+# boxbilling_api "admin/extension/config mod_email" do
+#   path "admin/extension/config"
+#   data ({
+#     :ext => "mod_email",
+#     :log_enabled => 1,
+#     :mailer => "smtp", # sendmail | smtp
+#     :smtp_host => smtp_host,
+#     :smtp_port => 587,
+#     :smtp_username => smtp_username,
+#     :smtp_password => smtp_password,
+#     :smtp_security => "tls",
+#   })
+#   action :update
+# end
+
+# =============================================================================
+# Configuration > Settings > Invoice settings
+# =============================================================================
+
+# Set next invoice number
+# IMPORTANT: this must be run only once, will cause duplicated invoice numbers
+boxbilling_api "admin/system/params invoice starting_number" do
+  path "admin/system/params"
+  data ({
+    :invoice_starting_number => "1",
+  })
+  action :nothing
+end
+
+boxbilling_api "admin/system/params invoice settings" do
+  path "admin/system/params"
+  data ({
+    :invoice_issue_days_before_expire => 14,
+    :invoice_due_days => 5,
+    :invoice_auto_approval => 1,
+    :remove_after_days => 0,
+    :invoice_series => "PRO-N",
+    :invoice_series_paid => "N",
+    :invoice_refund_logic => "credit_note", # negative_invoice | credit_note | manual
+    :funds_min_amount => 10,
+    :funds_max_amount => 200,
+  })
+  action :update
+  notifies :update, "boxbilling_api[admin/system/params invoice starting_number]"
+end
+
+# =============================================================================
+# Configuration > Settings > Orders settings
+# =============================================================================
+
+boxbilling_api "admin/extension/config mod_order" do
+  path "admin/extension/config"
+  data ({
+    :ext => "mod_order",
+    :order_renewal_logic => "from_expiration_date", # from_expiration_date | from_today | from_greater
+    :batch_suspend_reason => "",
+  })
+  action :update
+end
+
+# =============================================================================
+# Configuration > Settings > System settings
+# =============================================================================
+
+boxbilling_api "admin/system/params system settings" do
+  path "admin/system/params"
+  data({
+    :company_name => "Testing Labs, Ltd",
+    :company_logo => "",
+    :company_email => "testing@testing.com",
+    :company_tel => "1234567890",
+    :company_address_1 => "Somewhere",
+    :company_number => "B12345678",
+    :company_vat_number => "EU12345678",
+    :company_account_number => "BANK-1234",
+    :company_signature => "Testing signature",
+  })
+  action :update
+end
+
+# =============================================================================
+# Configuration > Domain registration/management
+# =============================================================================
+
+# Delete default domain TLD
+boxbilling_api "admin/servicedomain/tld" do
+  data ({
+    :tld => ".com",
+  })
+  action :delete
+end
+
+# =============================================================================
+# Configuration > Payment gateways
+# =============================================================================
+
+boxbilling_api "admin/invoice/gateway Custom" do
+  path "admin/invoice/gateway"
+  data ({
+    :id => 1,
+    :enabled => 0,
+    :test_mode => 0,
+  })
+  action :update
+end
+
+# boxbilling_api "admin/invoice/gateway PayPal" do
+#   path "admin/invoice/gateway"
+#   data ({
+#     :id => 2,
+#     :enabled => 1,
+#     :config => {
+#       :email => paypal_email,
+#     },
+#     :accepted_currencies => %w{EUR USD GBP},
+#     :test_mode => 0,
+#   })
+#   action :update
+# end
+
+boxbilling_api "admin/invoice/gateway AlertPay" do
+  path "admin/invoice/gateway"
+  data ({
+    :id => 3,
+    :enabled => 0,
+    :test_mode => test_mode,
+  })
+  action :update
+end
+
+# =============================================================================
+# Configuration > Tax
+# =============================================================================
+
+# Enable taxes
+boxbilling_api "admin/system/params taxes" do
+  path "admin/system/params"
+  data({ :tax_enabled => 1 })
+  action :update
+end
+
+# It deletes all the taxes and regenerate them instead of checking if they
+# previously exists. Notified by boxbilling_api[admin/invoice/tax]
+boxbilling_api "admin/invoice/tax_setup_eu" do
+  data({
+    :name => "VAT EU12345678",
+    :taxrate => 21,
+  })
+  action :nothing
+end
+
+boxbilling_api "admin/invoice/tax" do
+  data ({
+    :id => 9, # important, must match tax id when usign auto generated/increment
+    :name => "EU12345678",
+    :taxrate => 21,
+    :country => "ES",
+  })
+  action :create
+  notifies :request, "boxbilling_api[admin/invoice/tax_setup_eu]"
+end
+```
+
+Testing
+=======
+
+See [TESTING.md](https://github.com/onddo/boxbilling-cookbook/blob/master/TESTING.md).
+
 Contributing
-------------
-TODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.
+============
 
-e.g.
-1. Fork the repository on Github
-2. Create a named feature branch (like `add_component_x`)
-3. Write you change
-4. Write tests for your change (if applicable)
-5. Run the tests, ensuring they all pass
-6. Submit a Pull Request using Github
+Please do not hesitate to [open an issue](https://github.com/onddo/boxbilling-cookbook/issues/new) with any questions or problems.
 
-License and Authors
--------------------
-Authors: TODO: List authors
+See [CONTRIBUTING.md](https://github.com/onddo/boxbilling-cookbook/blob/master/CONTRIBUTING.md).
+
+TODO
+====
+
+See [TODO.md](https://github.com/onddo/boxbilling-cookbook/blob/master/TODO.md).
+
+
+License and Author
+==================
+
+|                      |                                          |
+|:---------------------|:-----------------------------------------|
+| **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<team@onddo.com>) TODO
+| **Copyright:**       | Copyright (c) 2014, Onddo Labs, SL. (www.onddo.com)
+| **License:**         | Apache License, Version 2.0
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    
+        http://www.apache.org/licenses/LICENSE-2.0
+    
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
