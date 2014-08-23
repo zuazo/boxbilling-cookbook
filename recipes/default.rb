@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+Chef::Recipe.send(:include, Chef::EncryptedAttributesHelpers)
+
 #==============================================================================
 # Install packages needed by the recipe
 #==============================================================================
@@ -31,39 +33,13 @@ end
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-if Chef::Config[:solo]
-  if node['boxbilling']['config']['db_password'].nil?
-    Chef::Application.fatal!('You must set boxbilling\'s database password in chef-solo mode.')
-  else
-    db_password = node['boxbilling']['config']['db_password']
-  end
-  if node['boxbilling']['admin']['pass'].nil?
-    Chef::Application.fatal!('You must set boxbilling\'s admin password in chef-solo mode.')
-  else
-    admin_pass = node['boxbilling']['admin']['pass']
-  end
-else
-  include_recipe 'encrypted_attributes'
+self.encrypted_attributes_enabled = node['boxbilling']['encrypt_attributes']
 
-  # generate db_password
-  if Chef::EncryptedAttribute.exists?(node['boxbilling']['config']['db_password'])
-    Chef::EncryptedAttribute.update(node.set['boxbilling']['config']['db_password'])
-    db_password = Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
-  else
-    db_password = secure_password
-    node.set['boxbilling']['config']['db_password'] = Chef::EncryptedAttribute.create(db_password)
-  end
-
-  # generate admin_pass
-  if Chef::EncryptedAttribute.exists?(node['boxbilling']['admin']['pass'])
-    Chef::EncryptedAttribute.update(node.set['boxbilling']['admin']['pass'])
-    admin_pass = Chef::EncryptedAttribute.load(node['boxbilling']['admin']['pass'])
-  else
-    admin_pass = secure_password
-    node.set['boxbilling']['admin']['pass'] = Chef::EncryptedAttribute.create(admin_pass)
-  end
-
-  node.save
+db_password = encrypted_attribute_write(%w(boxbilling config db_password)) do
+  secure_password
+end
+admin_pass = encrypted_attribute_write(%w(boxbilling admin pass)) do
+  secure_password
 end
 
 #==============================================================================
@@ -108,14 +84,6 @@ end
 # Install MySQL
 #==============================================================================
 
-def server_root_password
-  if Chef::Config[:solo]
-    node['boxbilling']['mysql']['server_root_password']
-  else
-    Chef::EncryptedAttribute.load(node['boxbilling']['mysql']['server_root_password'])
-  end
-end
-
 if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
   include_recipe 'boxbilling::mysql'
   include_recipe 'database::mysql'
@@ -123,7 +91,7 @@ if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
   mysql_connection_info = {
     :host => 'localhost',
     :username => 'root',
-    :password => server_root_password,
+    :password => encrypted_attribute_read(['boxbilling', 'mysql', 'server_root_password']),
   }
 
   mysql_database node['boxbilling']['config']['db_name'] do

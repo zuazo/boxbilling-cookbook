@@ -11,7 +11,7 @@ supports 'ubuntu'
 
 depends 'apache2'
 depends 'database'
-depends 'encrypted_attributes'
+depends 'encrypted_attributes', '~> 0.2'
 depends 'mysql', '~> 5.0'
 depends 'openssl'
 depends 'php'
@@ -73,6 +73,13 @@ attribute 'boxbilling/ssl',
   :type => 'string',
   :choice => [ 'true', 'false' ],
   :default => 'true'
+
+attribute 'boxbilling/encrypt_attributes',
+  :display_name => 'boxbilling encrypt attributes',
+  :description => 'Whether to encrypt BoxBilling attributes containing credential secrets.',
+  :type => 'string',
+  :choice => [ 'true', 'false' ],
+  :default => 'false'
 
 attribute 'boxbilling/admin/name',
   :display_name => 'boxbilling admin name',

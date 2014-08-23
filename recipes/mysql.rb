@@ -18,30 +18,14 @@
 #
 
 Chef::Recipe.send(:include, Opscode::OpenSSL::Password) # include the #secure_password method
+Chef::Recipe.send(:include, Chef::EncryptedAttributesHelpers)
 
 def mysql_password(user)
   key = "server_#{user}_password"
-  if Chef::Config['solo']
-    if node['boxbilling']['mysql'][key].nil?
-      password = secure_password
-      node.set['boxbilling']['mysql'][key] = secure_password
-    end
-    node['boxbilling']['mysql'][key]
-  else # chef_client
-    include_recipe 'encrypted_attributes'
-
-    if Chef::EncryptedAttribute.exists?(node['boxbilling']['mysql'][key])
-      Chef::EncryptedAttribute.update(node.set['boxbilling']['mysql'][key])
-      password = Chef::EncryptedAttribute.load(node['boxbilling']['mysql'][key])
-    else
-      password = secure_password
-      node.set['boxbilling']['mysql'][key] = Chef::EncryptedAttribute.create(password)
-      node.save
-      password
-    end
-
-  end
+  encrypted_attribute_write(['boxbilling', 'mysql', key]) { secure_password }
 end
+
+self.encrypted_attributes_enabled = node['boxbilling']['encrypt_attributes']
 
 recipe = self
 mysql_service node['mysql']['service_name'] do

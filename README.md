@@ -83,6 +83,11 @@ Attributes
     <td><code>true</code></td>
   </tr>
   <tr>
+    <td><code>node["boxbilling"]["encrypt_attributes"]</code></td>
+    <td>Whether to encrypt BoxBilling attributes containing credential secrets.</td>
+    <td><code>false</code></td>
+  </tr>
+  <tr>
     <td><code>node["boxbilling"]["admin"]["name"]</code></td>
     <td>BoxBilling admin user name.</td>
     <td><code>"Admin"</code></td>
