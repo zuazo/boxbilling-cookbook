@@ -14,8 +14,13 @@
   <Directory <%= @params[:docroot] %>>
     Options <%= [@params[:directory_options] || "FollowSymLinks" ].flatten.join " " %>
     AllowOverride <%= [@params[:allow_override] || "None" ].flatten.join " " %>
+    
+<% if node['apache']['version'].to_f >= 2.4 -%>
+    Require all granted
+<% else -%>
     Order allow,deny
     allow from all
+<% end -%>
   </Directory>
 
   <Directory />
@@ -26,9 +31,13 @@
   <Location /server-status>
     SetHandler server-status
 
+<% if node['apache']['version'].to_f >= 2.4 -%>
+    Require ip 127.0.0.1
+<% else -%>
     Order Deny,Allow
     Deny from all
     Allow from 127.0.0.1
+<% end -%>
   </Location>
 
   LogLevel info
