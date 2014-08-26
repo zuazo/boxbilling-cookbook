@@ -18,7 +18,7 @@ depends 'php'
 depends 'ssl_certificate'
 depends 'yum-epel'
 
-recipe 'boxbilling::default', 'Installs and configures BoxBilling.'
+recipe 'boxbilling::default', 'Installs and configures BoxBilling. Including the MySQL server if set to localhost.'
 recipe 'boxbilling::api', 'Installs the requirementes to use boxbilling_api resource.'
 recipe 'boxbilling::mysql', 'Installs MySQL server for BoxBilling.'
 

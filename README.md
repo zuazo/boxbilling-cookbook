@@ -22,7 +22,7 @@ Please, [let us know](https://github.com/onddo/boxbilling-cookbook/issues/new?ti
 
 * [apache2](https://supermarket.getchef.com/cookbooks/apache2)
 * [database](https://supermarket.getchef.com/cookbooks/database)
-* [encrypted_attributes](https://supermarket.getchef.com/cookbooks/encrypted_attributes)
+* [encrypted_attributes (~> 0.2)](https://supermarket.getchef.com/cookbooks/encrypted_attributes)
 * [mysql (~> 5.0)](https://supermarket.getchef.com/cookbooks/mysql)
 * [openssl](https://supermarket.getchef.com/cookbooks/openssl)
 * [php](https://supermarket.getchef.com/cookbooks/php)
@@ -179,35 +179,64 @@ Attributes
   </tr>
   <tr>
     <td><code>node["boxbilling"]["mysql"]["server_root_password"]</code></td>
-    <td>BoxBilling MySQL root password.</td>
+    <td>BoxBilling MySQL <em>root</em> password.</td>
     <td><em>calculated</em></td>
   </tr>
   <tr>
     <td><code>node["boxbilling"]["mysql"]["server_debian_password"]</code></td>
-    <td>BoxBilling MySQL debian user password.</td>
+    <td>BoxBilling MySQL <em>debian</em> user password.</td>
     <td><em>calculated</em></td>
   </tr>
   <tr>
     <td><code>node["boxbilling"]["mysql"]["server_repl_password"]</code></td>
-    <td>BoxBilling MySQL repl user password.</td>
+    <td>BoxBilling MySQL <em>repl</em> user password.</td>
     <td><em>calculated</em></td>
   </tr>
 </table>
 
 ## The HTTPS Certificate
 
-This cookbook uses the [`ssl_certificate`](https://supermarket.getchef.com/cookbooks/ssl_certificate) cookbook to create the HTTPS certificate. The namespace used is `node["boxbilling"]`. See the [`ssl_certificate` namespace documentation](https://supermarket.getchef.com/cookbooks/ssl_certificate#namespaces) for more information.
+This cookbook uses the [`ssl_certificate`](https://supermarket.getchef.com/cookbooks/ssl_certificate) cookbook to create the HTTPS certificate. The namespace used is `node["boxbilling"]`. For example:
+
+```ruby
+node.default["boxbilling"]["common_name"] = "boxbilling.example.com"
+node.default["boxbilling"]["config"]["license"] = "..." # BB_LICENSE key
+include_recipe "boxbilling"
+```
+
+See the [`ssl_certificate` namespace documentation](https://supermarket.getchef.com/cookbooks/ssl_certificate#namespaces) for more information.
+
+## Encrypted Attributes
+
+This cookbook can use the [encrypted_attributes](https://supermarket.getchef.com/cookbooks/encrypted_attributes) cookbook to encrypt the secrets generated during the *Chef Run*. This feature is disabled by default, but can be enabled setting the `node["boxbilling"]["encrypt_attributes"]` attribute to `true`. For example:
+
+```ruby
+include_recipe "encrypted_attributes::users_data_bag"
+node.default["boxbilling"]["encrypt_attributes"] = true
+node.default["boxbilling"]["config"]["license"] = "..." # BB_LICENSE key
+inclure_recipe "boxbilling"
+```
+
+This will create the following encrypted attributes:
+
+* `node['boxbilling']['admin']['pass']`: BoxBilling admin password.
+* `node['boxbilling']['mysql']['root']`: MySQL *root* user password.
+* `node['boxbilling']['mysql']['debian']`: MySQL *debian* user password.
+* `node['boxbilling']['mysql']['repl']`: MySQL *repl* user password.
+* `node['boxbilling']['config']['db_password']`: MySQL BoxBilling user password.
+
+Read the [`chef-encrypted-attributes` gem documentation](http://onddo.github.io/chef-encrypted-attributes/) to learn how to read them.
 
 Recipes
 =======
 
 ## boxbilling::default
 
-Installs and configures BoxBilling.
+Installs and configures BoxBilling. Including the MySQL server if set to localhost.
 
 ## boxbilling::api
 
-Installs the requirementes to use `boxbilling_api` resource.
+Installs the requirementes to use the `boxbilling_api` resource.
 
 ## boxbilling::mysql
 
@@ -224,7 +253,7 @@ This resource uses the [BoxBilling v2 Admin API](http://www.boxbilling.com/docs/
 * The *update* action is simulated for some objects that do not support it, using *delete* and *create*.
 * All the action names has been simplified to *create*, *update* and *delete*.
 
-**Note:** Keep in mind that some API calls require self-generated/auto-incremented MySQL identifiers. So its use can become complicated sometimes.
+**Note:** Keep in mind that some API calls require self-generated/auto-incremented MySQL identifiers. So their use can become difficult sometimes.
 
 ## boxbilling_api Actions
 
