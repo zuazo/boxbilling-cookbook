@@ -13,7 +13,7 @@ default['boxbilling']['php_packages'] = case node['platform']
 end
 
 default['boxbilling']['dir'] = '/srv/www/boxbilling'
-default['boxbilling']['server_name'] = node['fqdn']
+default['boxbilling']['server_name'] = node['fqdn'] || 'boxbilling.local'
 default['boxbilling']['server_aliases'] = nil
 default['boxbilling']['cron_enabled'] = true
 default['boxbilling']['headers'] = {}

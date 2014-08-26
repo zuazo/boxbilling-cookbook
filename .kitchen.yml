@@ -12,10 +12,22 @@ provisioner:
   require_chef_omnibus: true
 
 platforms:
+- name: debian-7.4
+  driver_config:
+    box: opscode-debian-7.4
+    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_debian-7.4_chef-provisionerless.box
+  run_list:
+  - recipe[apt]
 - name: ubuntu-12.04
   driver_config:
     box: opscode-ubuntu-12.04
     box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
+  run_list:
+  - recipe[apt]
+- name: ubuntu-14.04
+  driver_config:
+    box: opscode-ubuntu-14.04
+    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box
   run_list:
   - recipe[apt]
 - name: centos-6.5
@@ -28,4 +40,6 @@ platforms:
 suites:
 - name: default
   run_list: ["recipe[boxbilling_test]"]
-  attributes: {}
+  attributes:
+    apt:
+      compile_time_update: true
