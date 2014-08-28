@@ -115,6 +115,7 @@ describe 'boxbilling::default' do
 
   context 'apache_site default definition' do
     it 'should disable default site' do
+      allow(::File).to receive(:symlink?).with(any_args).and_return(false)
       allow(::File).to receive(:symlink?).with(/sites-enabled\/default\.conf$/).and_return(true)
       expect(chef_run).to run_execute('a2dissite default.conf')
     end
