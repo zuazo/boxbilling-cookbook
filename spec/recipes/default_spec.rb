@@ -40,6 +40,7 @@ describe 'boxbilling::default' do
   end
   before do
     allow(Kernel).to receive(:require).with('sequel')
+    stub_command('/usr/sbin/apache2 -t').and_return(true)
   end
 
   it 'should install unzip package' do
