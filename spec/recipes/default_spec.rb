@@ -115,7 +115,7 @@ describe 'boxbilling::default' do
 
   context 'apache_site default definition' do
     it 'should disable default site' do
-      expect(chef_run).to run_execute('a2dissite default')
+      expect(chef_run).to run_execute('a2dissite default.conf')
     end
   end
 
