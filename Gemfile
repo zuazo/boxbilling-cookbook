@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -17,13 +18,13 @@ group :unit do
   gem 'chefspec', '~> 4.0'
 end
 
-group :integration, :kitchen do
-  gem 'vagrant', github: 'mitchellh/vagrant'
+group :integration do
+  gem 'vagrant-wrapper', '~> 1.2'
   gem 'test-kitchen', '~> 1.2'
   gem 'kitchen-vagrant', '~> 0.10'
 end
 
-group :integration_cloud, :kitchen_cloud do
+group :integration, :integration_cloud do
   gem 'kitchen-ec2', '~> 0.8'
-  gem 'kitchen-digitalocean', '~> 0.7'
+  gem 'kitchen-digitalocean', '~> 0.8'
 end
