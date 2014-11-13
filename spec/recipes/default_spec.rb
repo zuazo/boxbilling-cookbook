@@ -40,6 +40,7 @@ describe 'boxbilling::default' do
   end
   before do
     allow(Kernel).to receive(:require).with('sequel')
+    stub_command('/usr/sbin/apache2 -t').and_return(true)
   end
 
   it 'should install unzip package' do
@@ -114,7 +115,9 @@ describe 'boxbilling::default' do
 
   context 'apache_site default definition' do
     it 'should disable default site' do
-      expect(chef_run).to run_execute('a2dissite default')
+      allow(::File).to receive(:symlink?).with(any_args).and_return(false)
+      allow(::File).to receive(:symlink?).with(/sites-enabled\/default\.conf$/).and_return(true)
+      expect(chef_run).to run_execute('a2dissite default.conf')
     end
   end
 
