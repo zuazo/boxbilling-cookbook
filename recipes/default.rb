@@ -283,7 +283,6 @@ template 'api-config.php' do
   variables(
     config: node['boxbilling']['api_config']
   )
-  only_if { node['boxbilling']['api_config'] }
 end
 
 # create htaccess file
