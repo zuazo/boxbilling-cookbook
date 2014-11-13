@@ -164,13 +164,6 @@ attribute 'boxbilling/config/debug',
   :choice => [ 'true', 'false' ],
   :default => 'false'
 
-attribute 'boxbilling/api_config/enabled',
-  :display_name => 'boxbilling api config enabled',
-  :description => 'Whether to generate API configuration file (api-config.php).',
-  :type => 'string',
-  :choice => [ 'true', 'false' ],
-  :default => 'true'
-
 attribute 'boxbilling/api_config/require_referer_header',
   :display_name => 'boxbilling api config require referer header',
   :description => 'Whether to enable require referer header in the API.',
