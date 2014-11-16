@@ -90,11 +90,6 @@ Attributes
     <td><code>false</code></td>
   </tr>
   <tr>
-    <td><code>node["boxbilling"]["admin"]["name"]</code></td>
-    <td>BoxBilling admin user name.</td>
-    <td><code>"Admin"</code></td>
-  </tr>
-  <tr>
     <td><code>node["boxbilling"]["admin"]["email"]</code></td>
     <td>BoxBilling admin email.</td>
     <td><code>"admin@#{node['boxbilling']['server_name']}"</code></td>

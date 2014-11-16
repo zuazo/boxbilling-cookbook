@@ -16,13 +16,15 @@ module BoxBilling
         :api_token => nil,
         :referer => nil,
         :debug => false,
+        :endpoint => '/api%{path}'
       }.merge(args)
       opts[:proto] = opts[:ssl] ? 'https' : 'http' unless opts[:proto]
       opts[:port] = opts[:ssl] ? 443 : 80 unless opts[:port]
       opts[:path] = "/#{opts[:path]}" unless opts[:path][0] === '/'
 
       # Create HTTP object
-      uri = URI.parse("#{opts[:proto]}://#{opts[:host]}:#{opts[:port]}/api#{opts[:path]}")
+      path = opts[:endpoint] % {:path => opts[:path]}
+      uri = URI.parse("#{opts[:proto]}://#{opts[:host]}:#{opts[:port]}#{path}")
       http = Net::HTTP.new(uri.host, uri.port)
       if opts[:ssl]
         require 'net/https'

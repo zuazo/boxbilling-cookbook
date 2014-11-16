@@ -1,0 +1,115 @@
+<?php
+/**
+ * BoxBilling configuration file
+ *
+ * If you are not using the web-installer, you can rename this file
+ * to "bb-config.php" and fill in the values.
+ * Import /install/structure.sql to your database
+ * Open browser http://www.youdomain.com/index.php?_url=/bb-admin to create new admin account.
+ * Remove /install directory
+ */
+
+return array(
+
+    /**
+     * Set BoxBilling license key. Get license key at http://www.boxbilling.com
+     */
+    'license'     => '<%= @license %>',
+
+    'salt'        => '<%= @salt %>',
+
+    /**
+     * Full URL where BoxBilling is installed with trailing slash
+     */
+    'url'     => '<%= @url %>',
+
+    'admin_area_prefix' =>  '/bb-admin',
+
+    /**
+     * Enable or Disable the display of notices
+     */
+    'debug'     => <%= @debug.to_s %>,
+
+    /**
+     * Enable or Disable search engine friendly urls.
+     * Configure .htaccess file before enabling this feature
+     * Set to TRUE if using nginx
+     */
+    'sef_urls'  => <%= @sef_urls.to_s %>,
+
+    /**
+     * Application timezone
+     */
+    'timezone'    =>  '<%= @timezone %>',
+
+    /**
+     * Set BoxBilling locale
+     */
+    'locale'    =>  '<%= @locale %>',
+
+    /**
+     * Set default date format for localized strings
+     * Format information: http://php.net/manual/en/function.strftime.php
+     */
+    'locale_date_format'    =>  '%A, %d %B %G',
+
+    /**
+     * Set default time format for localized strings
+     * Format information: http://php.net/manual/en/function.strftime.php
+     */
+    'locale_time_format'    =>  ' %T',
+
+    /**
+     * Set location to store sensitive data
+     */
+    'path_data'  => dirname(__FILE__) . '/bb-data',
+
+    'path_logs'  => dirname(__FILE__) . '/bb-data/log/application.log',
+
+    'db'    =>  array(
+        /**
+         * Database type. Don't change this if in doubt.
+         */
+        'type'   =>'mysql',
+
+        /**
+         * Database hostname. Don't change this if in doubt.
+         */
+        'host'   =>'<%= @db_host %>',
+
+        /**
+         * The name of the database for BoxBilling
+         */
+        'name'   =>'<%= @db_name %>',
+
+        /**
+         * Database username
+         */
+        'user'   =>'<%= @db_user %>',
+
+        /**
+         * Database password
+         */
+        'password'   =>'<%= @db_password %>',
+    ),
+
+    'twig'   =>  array(
+        'debug'         =>  false,
+        'auto_reload'   =>  false,
+        'cache'         =>  dirname(__FILE__) . '/bb-data/cache',
+    ),
+
+    'api'   =>  array(
+        // all requests made to API must have referrer request header with the same url as BoxBilling installation
+        'require_referrer_header'   =>  <%= @api['require_referer_header'].to_s %>,
+
+        // empty array will allow all IPs to access API
+        'allowed_ips'       =>  array(<%= @api['allowed_ips'].map {|x| "'#{x}'" }.join(', ') %>),
+
+        // Time span for limit in seconds
+        'rate_span'         =>  <%= @api['rate_span'] %>,
+
+        // How many requests allowed per time span
+        'rate_limit'        =>  <%= @api['rate_limit'] %>,
+    ),
+);

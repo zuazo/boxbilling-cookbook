@@ -40,7 +40,11 @@ RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
+<% if boxbilling4? -%>
+RewriteRule ^(.*)$ index.php?_url=/$1 [QSA,L]
+<% else -%>
 RewriteRule ^.*$ index.php [NC,L]
+<% end -%>
 <% end -%>
 
 <FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak|phtml|sql)$">

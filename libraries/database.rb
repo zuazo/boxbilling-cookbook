@@ -35,6 +35,12 @@ module BoxBilling
       end
     end
 
+    def database_empty?
+      connect do |db|
+        db.tables.empty?
+      end
+    end
+
   protected
 
     def generatepassword(len=8)

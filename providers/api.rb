@@ -11,6 +11,7 @@ def get_admin_api_token
     Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
   end
   db = BoxBilling::Database.new({
+    :host => node['boxbilling']['config']['db_host'],
     :database => node['boxbilling']['config']['db_name'],
     :user     => node['boxbilling']['config']['db_user'],
     :password => password,
@@ -110,24 +111,38 @@ def path_supports?(path, action)
 
   return false if path == 'admin/invoice/tax' and action == :get
   return false if path == 'admin/invoice/tax' and action == :update
+  return false if path == 'guest/staff' and action == :get
+  return false if path == 'guest/staff' and action == :get_list
+  return false if path == 'guest/staff' and action == :update
   return true
 end
 
 def boxbilling_api_request(action=nil, args={})
-  api_token = get_admin_api_token
   opts = {
     :path => path_with_action(new_resource.path, action),
     :data => args[:data] || new_resource.data,
-    :api_token => api_token,
+    :api_token => nil,
     :referer => node['boxbilling']['config']['url'],
     :debug => new_resource.debug,
   }
+
+  if opts[:path].match(/^\/?admin\//)
+    opts[:api_token] = get_admin_api_token
+  end
+
+  if node['boxbilling']['config']['sef_urls']
+    opts[:endpoint] = '/api%{path}'
+  elsif BoxBilling::get_version_from_url(node['boxbilling']['download_url']) =~ /^4\./
+    opts[:endpoint] = '/index.php?_url=/api%{path}'
+  else
+    opts[:endpoint] = '/index.php/api%{path}'
+  end
 
   if args[:ignore_failure].nil? ? new_resource.ignore_failure : args[:ignore_failure]
     begin
       BoxBilling::API.request(opts)
     rescue Exception => e
-      Chef::Log.info("Ignored exception: #{e.to_s}") if opts[:debug]
+      Chef::Log.warn("Ignored exception: #{e.to_s}")
       nil
     end
   else
@@ -139,7 +154,7 @@ def boxbilling_api_request_read(args={})
   path = filter_path(new_resource.path)
   if path_supports?(new_resource.path, :get)
     boxbilling_api_request(:get, args)
-  else # some objects do not support :get, we should use :get_list
+  elsif path_supports?(new_resource.path, :get_list) # some objects do not support :get, we should use :get_list
     data_pkeys = get_primary_keys_from_data(new_resource.data)
     page = 1
     begin
@@ -155,6 +170,8 @@ def boxbilling_api_request_read(args={})
       end
       page = page + 1
     end while page <= get_list['pages']
+    return nil
+  else
     return nil
   end
 end

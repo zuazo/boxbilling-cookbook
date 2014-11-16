@@ -18,6 +18,8 @@
 #
 
 Chef::Recipe.send(:include, Chef::EncryptedAttributesHelpers)
+Chef::Recipe.send(:include, ::BoxBilling::RecipeHelpers)
+recipe = self
 
 #==============================================================================
 # Install packages needed by the recipe
@@ -41,6 +43,9 @@ end
 admin_pass = encrypted_attribute_write(%w(boxbilling admin pass)) do
   secure_password
 end
+salt = encrypted_attribute_write(%w(boxbilling config salt)) do
+  secure_password
+end
 
 #==============================================================================
 # Install PHP
@@ -59,25 +64,27 @@ end
 # Install IonCube loader
 #==============================================================================
 
-ioncube_file = ::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz')
+unless boxbilling4?
+  ioncube_file = ::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz')
 
-remote_file 'download ioncube' do
-  if node['kernel']['machine'] =~ /x86_64/
-    source 'http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz'
-  else
-    source 'http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86.tar.gz'
+  remote_file 'download ioncube' do
+    if node['kernel']['machine'] =~ /x86_64/
+      source 'http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz'
+    else
+      source 'http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86.tar.gz'
+    end
+    path ioncube_file
+    action :create_if_missing
   end
-  path ioncube_file
-  action :create_if_missing
-end
 
-execute 'install ioncube' do
-  command <<-EOF
-    cd "$(php -i | awk '$1 == "extension_dir" {print $NF}')" &&
-    tar xfz '#{ioncube_file}' --strip-components=1 --no-same-owner --wildcards --no-anchored '*.so' &&
-    echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | grep -o '[0-9][.][0-9][0-9]*' | head -1).so" > '#{node['php']['ext_conf_dir']}/20ioncube.ini'
-    EOF
-  creates ::File.join(node['php']['ext_conf_dir'], '20ioncube.ini')
+  execute 'install ioncube' do
+    command <<-EOF
+      cd "$(php -i | awk '$1 == "extension_dir" {print $NF}')" &&
+      tar xfz '#{ioncube_file}' --strip-components=1 --no-same-owner --wildcards --no-anchored '*.so' &&
+      echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | grep -o '[0-9][.][0-9][0-9]*' | head -1).so" > '#{node['php']['ext_conf_dir']}/20ioncube.ini'
+      EOF
+    creates ::File.join(node['php']['ext_conf_dir'], '20ioncube.ini')
+  end
 end
 
 #==============================================================================
@@ -117,7 +124,7 @@ directory node['boxbilling']['dir'] do
   recursive true
 end
 
-basename = ::File.basename(node['boxbilling']['download_url'])
+basename = "BoxBilling-#{boxbilling_version}.zip"
 local_file = ::File.join(Chef::Config[:file_cache_path], basename)
 
 remote_file 'download boxbilling' do
@@ -214,48 +221,14 @@ end
   end
 end
 
-# set permissions for configuration file
-file 'bb-config.php' do
-  path ::File.join(node['boxbilling']['dir'], 'bb-config.php')
-  owner node['apache']['user']
-  group node['apache']['group']
-  mode 00640
-  action :create_if_missing
-  notifies :restart, 'service[apache2]', :immediately
-  notifies :create, 'ruby_block[run boxbilling setup]', :immediately
-end
-
-# install BoxBilling
-ruby_block 'run boxbilling setup' do
-  block do
-    self.class.send(:include, ::BoxBilling::RecipeHelpers)
-
-    boxbilling_setup(node['boxbilling']['server_name'], {
-      :agree => '1',
-      :db_host => node['boxbilling']['config']['db_host'],
-      :db_name => node['boxbilling']['config']['db_name'],
-      :db_user => node['boxbilling']['config']['db_user'],
-      :db_pass => db_password,
-      :admin_name => node['boxbilling']['admin']['name'],
-      :admin_email => node['boxbilling']['admin']['email'],
-      :admin_pass => admin_pass,
-      :license => node['boxbilling']['config']['license']
-    })
-  end
-  action :nothing
-end
-
-# remove installation dir
-directory 'install dir' do
-  path ::File.join(node['boxbilling']['dir'], 'install')
-  recursive true
-  action :delete
-end
-
 # create configuration file
 template 'bb-config.php' do
   path ::File.join(node['boxbilling']['dir'], 'bb-config.php')
-  source 'bb-config.php.erb'
+  if recipe.boxbilling3?
+    source 'bb-config.php.bb3.erb'
+  else
+    source 'bb-config.php.bb4.erb'
+  end
   owner node['apache']['user']
   group node['apache']['group']
   mode 00640
@@ -269,7 +242,9 @@ template 'bb-config.php' do
     :license => node['boxbilling']['config']['license'],
     :locale => node['boxbilling']['config']['locale'],
     :sef_urls => node['boxbilling']['config']['sef_urls'],
-    :debug => node['boxbilling']['config']['debug']
+    :debug => node['boxbilling']['config']['debug'],
+    :salt => salt,
+    :api => node['boxbilling']['api_config'] || {}
   )
 end
 
@@ -283,7 +258,7 @@ template 'api-config.php' do
   variables(
     config: node['boxbilling']['api_config']
   )
-  only_if { node['boxbilling']['api_config'] }
+  not_if { recipe.boxbilling4? }
 end
 
 # create htaccess file
@@ -297,6 +272,48 @@ template 'boxbilling .htaccess' do
     :domain => node['boxbilling']['server_name'].gsub(/^www\./, ''),
     :sef_urls => node['boxbilling']['config']['sef_urls']
   )
+  helpers ::BoxBilling::RecipeHelpers
+end
+
+# create database content
+mysql_database 'create database content' do
+  database_name node['boxbilling']['config']['db_name']
+  connection(
+    :host => node['boxbilling']['config']['db_host'],
+    :username => node['boxbilling']['config']['db_user'],
+    :password => db_password
+  )
+  sql do
+    sql = ::File.open(::File.join(node['boxbilling']['dir'], 'install', 'structure.sql')).read
+    if File.exists?(::File.join(node['boxbilling']['dir'], 'install', 'content.sql'))
+      sql << ::File.open(::File.join(node['boxbilling']['dir'], 'install', 'content.sql')).read
+    end
+    sql
+  end
+  action :query
+  only_if {
+    recipe.database_empty?
+  }
+  notifies :restart, 'service[apache2]', :immediately
+  notifies :create, 'boxbilling_api[create admin user]', :immediately
+end
+
+# create admin user
+boxbilling_api "create admin user" do
+  path "guest/staff"
+  data ({
+    :email => node['boxbilling']['admin']['email'],
+    :password => admin_pass,
+  })
+  ignore_failure true
+  action :nothing
+end
+
+# remove installation dir
+directory 'install dir' do
+  path ::File.join(node['boxbilling']['dir'], 'install')
+  recursive true
+  action :delete
 end
 
 #==============================================================================
