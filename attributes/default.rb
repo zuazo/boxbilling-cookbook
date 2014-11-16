@@ -35,7 +35,6 @@ default['boxbilling']['config']['locale'] = 'en_US'
 default['boxbilling']['config']['sef_urls'] = false
 default['boxbilling']['config']['debug'] = false
 
-default['boxbilling']['api_config']['enabled'] = true
 default['boxbilling']['api_config']['require_referer_header'] = true
 default['boxbilling']['api_config']['allowed_ips'] = []
 default['boxbilling']['api_config']['rate_span'] = 60 * 60

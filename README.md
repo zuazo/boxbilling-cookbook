@@ -150,11 +150,6 @@ Attributes
     <td><code>false</code></td>
   </tr>
   <tr>
-    <td><code>node["boxbilling"]["api_config"]["enabled"]</code></td>
-    <td>Whether to generate API configuration file (<em>api-config.php</em>).</td>
-    <td><code>true</code></td>
-  </tr>
-  <tr>
     <td><code>node["boxbilling"]["api_config"]["require_referer_header"]</code></td>
     <td>Whether to enable <em>require referer header</em> in the API.</td>
     <td><code>true</code></td>
