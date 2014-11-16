@@ -24,6 +24,12 @@ class Chef::Recipe
   def require(string)
     Kernel.require(string)
   end
+  def database_empty?
+    return true
+  end
+  def boxbilling_version
+    Kernel.boxbilling_version
+  end
 end
 
 describe 'boxbilling::default' do
@@ -40,6 +46,7 @@ describe 'boxbilling::default' do
   end
   before do
     allow(Kernel).to receive(:require).with('sequel')
+    allow(Kernel).to receive(:boxbilling_version).and_return('3.0.0')
     stub_command('/usr/sbin/apache2 -t').and_return(true)
   end
 
@@ -55,16 +62,6 @@ describe 'boxbilling::default' do
     it "should install #{pkg} package" do
       expect(chef_run).to install_package(pkg)
     end
-  end
-
-  it 'should download ioncube' do
-    expect(chef_run).to create_remote_file_if_missing('download ioncube')
-      .with_path(::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz'))
-  end
-
-  it 'should install ioncube' do
-    expect(chef_run).to run_execute('install ioncube')
-      .with_creates(/ioncube\.ini$/)
   end
 
   it 'should include boxbilling::mysql recipe' do
@@ -93,10 +90,10 @@ describe 'boxbilling::default' do
 
   it 'should download boxbilling' do
     expect(chef_run).to create_remote_file_if_missing('download boxbilling')
-      .with_path(::File.join(Chef::Config[:file_cache_path], 'latest.zip'))
+      .with_path(::File.join(Chef::Config[:file_cache_path], 'BoxBilling-3.0.0.zip'))
   end
 
-  it 'should extrac boxbilling' do
+  it 'should extract boxbilling' do
     expect(chef_run).to run_execute('extract boxbilling')
       .with_command(/^unzip /)
       .with_creates(/\/index\.php$/)
@@ -177,36 +174,8 @@ describe 'boxbilling::default' do
     end
   end
 
-  it 'should set bb-config.php file permissions' do
-    expect(chef_run).to create_file_if_missing('bb-config.php')
-      .with_owner('www-data')
-      .with_group('www-data')
-      .with_mode(00640)
-  end
-
-  it 'bb-config.php should notify setup' do
-    resource = chef_run.file('bb-config.php')
-    expect(resource).to notify('ruby_block[run boxbilling setup]').to(:create).immediately
-  end
-
-  it 'should do nothing with boxbilling setup' do
-    resource = chef_run.ruby_block('run boxbilling setup')
-    expect(resource).to do_nothing
-  end
-
-  it 'should remove installation dir' do
-    expect(chef_run).to delete_directory(end_with('/install'))
-  end
-
   it 'should create bb-config.php file' do
     expect(chef_run).to create_template('bb-config.php')
-      .with_owner('www-data')
-      .with_group('www-data')
-      .with_mode(00640)
-  end
-
-  it 'should create api-config.php file' do
-    expect(chef_run).to create_template('api-config.php')
       .with_owner('www-data')
       .with_group('www-data')
       .with_mode(00640)
@@ -219,6 +188,25 @@ describe 'boxbilling::default' do
       .with_mode(00640)
   end
 
+  it 'should create database content' do
+    expect(chef_run).to query_mysql_database('create database content')
+      .with_database_name(db_name)
+  end
+
+  it 'create database content should notify create admin user' do
+    resource = chef_run.find_resource('mysql_database', 'create database content')
+    expect(resource).to notify('boxbilling_api[create admin user]').to(:create).immediately
+  end
+
+  it 'should do nothing with create admin user' do
+    resource = chef_run.find_resource('boxbilling_api', 'create admin user')
+    expect(resource).to do_nothing
+  end
+
+  it 'should remove installation dir' do
+    expect(chef_run).to delete_directory(end_with('/install'))
+  end
+
   it 'should enable bb-cron.php cron file' do
     expect(chef_run).to create_cron('boxbilling cron')
       .with_user('www-data')
@@ -228,6 +216,41 @@ describe 'boxbilling::default' do
 
   it 'should include boxbilling::api recipe' do
     expect(chef_run).to include_recipe('boxbilling::api')
+  end
+
+  context 'with boxbilling3' do
+    it 'should download ioncube' do
+      expect(chef_run).to create_remote_file_if_missing('download ioncube')
+        .with_path(::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz'))
+    end
+
+    it 'should install ioncube' do
+      expect(chef_run).to run_execute('install ioncube')
+        .with_creates(/ioncube\.ini$/)
+    end
+    it 'should create api-config.php file' do
+      expect(chef_run).to create_template('api-config.php')
+        .with_owner('www-data')
+        .with_group('www-data')
+        .with_mode(00640)
+    end
+  end
+
+  context 'with boxbilling4' do
+    before do
+      allow(Kernel).to receive(:boxbilling_version).and_return('4.0.0')
+    end
+
+    it 'should not download ioncube' do
+      expect(chef_run).to_not create_remote_file_if_missing('download ioncube')
+    end
+
+    it 'should not install ioncube' do
+      expect(chef_run).to_not run_execute('install ioncube')
+    end
+    it 'should not create api-config.php file' do
+      expect(chef_run).to_not create_template('api-config.php')
+    end
   end
 
 end
