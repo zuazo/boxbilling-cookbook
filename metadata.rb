@@ -83,12 +83,6 @@ attribute 'boxbilling/encrypt_attributes',
   :choice => [ 'true', 'false' ],
   :default => 'false'
 
-attribute 'boxbilling/admin/name',
-  :display_name => 'boxbilling admin name',
-  :description => 'BoxBilling admin user name.',
-  :type => 'string',
-  :default => '"Admin"'
-
 attribute 'boxbilling/admin/email',
   :display_name => 'boxbilling admin email',
   :description => 'BoxBilling admin email.',
