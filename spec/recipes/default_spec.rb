@@ -24,12 +24,6 @@ class Chef::Recipe
   def require(string)
     Kernel.require(string)
   end
-  def database_empty?
-    return true
-  end
-  def boxbilling_version
-    Kernel.boxbilling_version
-  end
 end
 
 describe 'boxbilling::default' do
@@ -46,7 +40,10 @@ describe 'boxbilling::default' do
   end
   before do
     allow(Kernel).to receive(:require).with('sequel')
-    allow(Kernel).to receive(:boxbilling_version).and_return('3.0.0')
+    allow_any_instance_of(Chef::Recipe).to receive(:database_empty?)
+      .and_return(true)
+    allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
+      .and_return('4.0.0')
     stub_command('/usr/sbin/apache2 -t').and_return(true)
   end
 
@@ -90,7 +87,9 @@ describe 'boxbilling::default' do
 
   it 'should download boxbilling' do
     expect(chef_run).to create_remote_file_if_missing('download boxbilling')
-      .with_path(::File.join(Chef::Config[:file_cache_path], 'BoxBilling-3.0.0.zip'))
+      .with_path(
+        ::File.join(Chef::Config[:file_cache_path], 'BoxBilling-4.0.0.zip')
+      )
   end
 
   it 'should extract boxbilling' do
@@ -194,8 +193,11 @@ describe 'boxbilling::default' do
   end
 
   it 'create database content should notify create admin user' do
-    resource = chef_run.find_resource('mysql_database', 'create database content')
-    expect(resource).to notify('boxbilling_api[create admin user]').to(:create).immediately
+    resource = chef_run.find_resource(
+      'mysql_database', 'create database content'
+    )
+    expect(resource).to notify('boxbilling_api[create admin user]').to(:create)
+      .immediately
   end
 
   it 'should do nothing with create admin user' do
@@ -218,7 +220,12 @@ describe 'boxbilling::default' do
     expect(chef_run).to include_recipe('boxbilling::api')
   end
 
-  context 'with boxbilling3' do
+  context 'with boxbilling_lt4' do
+    before do
+      allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
+        .and_return('3.0.0')
+    end
+
     it 'should download ioncube' do
       expect(chef_run).to create_remote_file_if_missing('download ioncube')
         .with_path(::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz'))
@@ -238,7 +245,8 @@ describe 'boxbilling::default' do
 
   context 'with boxbilling4' do
     before do
-      allow(Kernel).to receive(:boxbilling_version).and_return('4.0.0')
+      allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
+        .and_return('4.0.0')
     end
 
     it 'should not download ioncube' do

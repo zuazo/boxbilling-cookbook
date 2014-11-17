@@ -36,9 +36,7 @@ module BoxBilling
     end
 
     def database_empty?
-      connect do |db|
-        db.tables.empty?
-      end
+      connect { |db| db.tables.empty? }
     end
 
   protected

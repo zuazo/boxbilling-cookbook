@@ -40,10 +40,10 @@ RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
-<% if boxbilling4? -%>
-RewriteRule ^(.*)$ index.php?_url=/$1 [QSA,L]
-<% else -%>
+<% if @boxbilling_lt4 -%>
 RewriteRule ^.*$ index.php [NC,L]
+<% else -%>
+RewriteRule ^(.*)$ index.php?_url=/$1 [QSA,L]
 <% end -%>
 <% end -%>
 

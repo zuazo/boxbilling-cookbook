@@ -41,14 +41,10 @@ suites:
 - name: boxbilling3
   run_list: ["recipe[boxbilling_test]"]
   attributes:
-    apt:
-      compile_time_update: true
     boxbilling:
-      download_url: https://dl.dropboxusercontent.com/s/kfbtol2dbcyiyi6/BoxBilling-3.6.11.zip
+      download_url: http://mirror.onddo.com/boxbilling-3.6.11.zip
 - name: boxbilling4
   run_list: ["recipe[boxbilling_test]"]
   attributes:
-    apt:
-      compile_time_update: true
     boxbilling:
       download_url: https://github.com/boxbilling/boxbilling/releases/download/4.11.11/BoxBilling.zip

@@ -64,7 +64,7 @@ end
 # Install IonCube loader
 #==============================================================================
 
-unless boxbilling4?
+if boxbilling_lt4?
   ioncube_file = ::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz')
 
   remote_file 'download ioncube' do
@@ -224,10 +224,10 @@ end
 # create configuration file
 template 'bb-config.php' do
   path ::File.join(node['boxbilling']['dir'], 'bb-config.php')
-  if recipe.boxbilling3?
-    source 'bb-config.php.bb3.erb'
+  if recipe.boxbilling_lt4?
+    source 'bb3/bb-config.php.erb'
   else
-    source 'bb-config.php.bb4.erb'
+    source 'bb4/bb-config.php.erb'
   end
   owner node['apache']['user']
   group node['apache']['group']
@@ -258,7 +258,7 @@ template 'api-config.php' do
   variables(
     config: node['boxbilling']['api_config']
   )
-  not_if { recipe.boxbilling4? }
+  only_if { recipe.boxbilling_lt4? }
 end
 
 # create htaccess file
@@ -270,9 +270,9 @@ template 'boxbilling .htaccess' do
   mode 00640
   variables(
     :domain => node['boxbilling']['server_name'].gsub(/^www\./, ''),
-    :sef_urls => node['boxbilling']['config']['sef_urls']
+    :sef_urls => node['boxbilling']['config']['sef_urls'],
+    :boxbilling_lt4 => recipe.boxbilling_lt4?
   )
-  helpers ::BoxBilling::RecipeHelpers
 end
 
 # create database content
@@ -284,27 +284,26 @@ mysql_database 'create database content' do
     :password => db_password
   )
   sql do
-    sql = ::File.open(::File.join(node['boxbilling']['dir'], 'install', 'structure.sql')).read
-    if File.exists?(::File.join(node['boxbilling']['dir'], 'install', 'content.sql'))
-      sql << ::File.open(::File.join(node['boxbilling']['dir'], 'install', 'content.sql')).read
-    end
-    sql
+    structure_sql =
+        ::File.join(node['boxbilling']['dir'], 'install', 'structure.sql')
+    content_sql =
+        ::File.join(node['boxbilling']['dir'], 'install', 'content.sql')
+    sql = ::File.open(structure_sql).read
+    ::File.exists?(content_sql) ? sql + ::File.open(content_sql).read : sql
   end
   action :query
-  only_if {
-    recipe.database_empty?
-  }
+  only_if { recipe.database_empty? }
   notifies :restart, 'service[apache2]', :immediately
   notifies :create, 'boxbilling_api[create admin user]', :immediately
 end
 
 # create admin user
-boxbilling_api "create admin user" do
-  path "guest/staff"
-  data ({
+boxbilling_api 'create admin user' do
+  path 'guest/staff'
+  data(
     :email => node['boxbilling']['admin']['email'],
     :password => admin_pass,
-  })
+  )
   ignore_failure true
   action :nothing
 end

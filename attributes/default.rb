@@ -1,4 +1,6 @@
 
+default['apt']['compile_time_update'] = true unless node['apt'].nil?
+
 default['boxbilling']['download_url'] = 'http://www.boxbilling.com/version/latest.zip'
 
 default['boxbilling']['required_packages'] = %w{ unzip }

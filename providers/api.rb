@@ -1,3 +1,4 @@
+self.class.send(:include, ::BoxBilling::RecipeHelpers)
 
 def whyrun_supported?
   true
@@ -11,7 +12,7 @@ def get_admin_api_token
     Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
   end
   db = BoxBilling::Database.new({
-    :host => node['boxbilling']['config']['db_host'],
+    :host     => node['boxbilling']['config']['db_host'],
     :database => node['boxbilling']['config']['db_name'],
     :user     => node['boxbilling']['config']['db_user'],
     :password => password,
@@ -126,16 +127,14 @@ def boxbilling_api_request(action=nil, args={})
     :debug => new_resource.debug,
   }
 
-  if opts[:path].match(/^\/?admin\//)
-    opts[:api_token] = get_admin_api_token
-  end
+  opts[:api_token] = get_admin_api_token if opts[:path].match(/^\/?admin\//)
 
   if node['boxbilling']['config']['sef_urls']
     opts[:endpoint] = '/api%{path}'
-  elsif BoxBilling::get_version_from_url(node['boxbilling']['download_url']) =~ /^4\./
-    opts[:endpoint] = '/index.php?_url=/api%{path}'
-  else
+  elsif boxbilling_lt4?
     opts[:endpoint] = '/index.php/api%{path}'
+  else
+    opts[:endpoint] = '/index.php?_url=/api%{path}'
   end
 
   if args[:ignore_failure].nil? ? new_resource.ignore_failure : args[:ignore_failure]
