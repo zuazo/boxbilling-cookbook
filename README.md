@@ -328,6 +328,19 @@ Another alternative is to include it in your *Run List*:
 }
 ```
 
+## Installing BoxBilling 4
+
+To install BoxBilling version 4, you must change the `node["boxbilling"]["download_url"]` attribute.
+
+You can use GitHub to download the release. For example:
+
+```ruby
+node.default["boxbilling"]["config"]["license"] = "..." # BB_LICENSE key
+node.default["boxbilling"]["download_url"] = "https://github.com/boxbilling/boxbilling/releases/download/4.11.11/BoxBilling.zip"
+
+include_recipe "boxbilling::default"
+```
+
 ## *boxbilling::default* Recipe Usage Example
 
 ```ruby
