@@ -153,6 +153,7 @@ describe 'boxbilling::default' do
     ).each do |dir|
       it "should set #{dir} directory writable" do
         expect(chef_run).to create_directory(end_with(dir))
+          .with_recursive(true)
           .with_owner('www-data')
           .with_group('www-data')
           .with_mode(00750)

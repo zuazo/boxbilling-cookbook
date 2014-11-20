@@ -202,6 +202,7 @@ end.concat([
   ::File.join('bb-themes', 'huraga', 'assets'),
 ]).each do |dir|
   directory ::File.join(node['boxbilling']['dir'], dir) do
+    recursive true
     owner node['apache']['user']
     group node['apache']['group']
     mode 00750
