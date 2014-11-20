@@ -199,6 +199,7 @@ end
   ::File.join('bb-data', data_dir)
 end.concat([
   ::File.join('bb-themes', 'boxbilling', 'assets'),
+  ::File.join('bb-themes', 'huraga', 'assets'),
 ]).each do |dir|
   directory ::File.join(node['boxbilling']['dir'], dir) do
     owner node['apache']['user']

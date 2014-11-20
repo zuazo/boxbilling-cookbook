@@ -149,6 +149,7 @@ describe 'boxbilling::default' do
       /bb-data/log
       /bb-data/uploads
       /bb-themes/boxbilling/assets
+      /bb-themes/huraga/assets
     ).each do |dir|
       it "should set #{dir} directory writable" do
         expect(chef_run).to create_directory(end_with(dir))
