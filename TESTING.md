@@ -98,6 +98,17 @@ To destroy the machine:
 
 ## ChefSpec Matchers
 
+### boxbilling_api(path)
+
+Helper method for locating a `boxbilling_api` resource in the collection.
+
+```ruby
+resource = chef_run.boxbilling_api('admin/system/params')
+expect(resource)
+  .to notify('boxbilling_api[admin/system/params invoice starting_number]')
+  .to(:update).delayed
+```
+
 ### request_boxbilling_api(path)
 
 Assert that the *Chef Run* makes a `boxbilling_api` request.
