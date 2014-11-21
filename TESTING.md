@@ -60,6 +60,42 @@ Then, you must configure test-kitchen to use `.kitchen.cloud.yml` configuration 
     $ bundle exec kitchen list
     [...]
 
+## Using Vagrant with the Vagrantfile
+
+### Vagrantfile Requirements
+
+* ChefDK: https://downloads.getchef.com/chef-dk/
+* Berkhelf and Omnibus vagrant plugins:
+```
+$ vagrant plugin install vagrant-berkshelf vagrant-omnibus
+```
+* The path correctly set for ChefDK:
+```
+$ export PATH="/opt/chefdk/bin:${PATH}"
+```
+* Set your license key in the `BB_LICENSE` enviroment variable:
+```
+$ export BB_LICENSE='PRO-1234'
+```
+
+### Vagrantfile Usage
+
+    $ vagrant up
+
+To run Chef again on the same machine:
+
+    $ vagrant provision
+
+The default login credentials are:
+
+* URL: [http://localhost:8080/bb-admin.php](http://localhost:8080/bb-admin.php)
+* Email: *test@example.com*
+* Password: *4dm1n_p4ss*
+
+To destroy the machine:
+
+    $ vagrant destroy
+
 ## ChefSpec Matchers
 
 ### request_boxbilling_api(path)
