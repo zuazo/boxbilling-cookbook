@@ -27,10 +27,8 @@ class Chef::Recipe
 end
 
 describe 'boxbilling::api' do
-  let(:chef_run) { ChefSpec::Runner.new.converge(described_recipe) }
-  before do
-    allow(Kernel).to receive(:require).with('sequel')
-  end
+  let(:chef_run) { ChefSpec::SoloRunner.new.converge(described_recipe) }
+  before { allow(Kernel).to receive(:require).with('sequel') }
 
   it 'installs sequel gem' do
     expect(chef_run).to install_chef_gem('sequel')
@@ -40,5 +38,4 @@ describe 'boxbilling::api' do
     expect(Kernel).to receive(:require).with('sequel').once
     chef_run
   end
-
 end

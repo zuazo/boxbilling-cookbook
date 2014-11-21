@@ -21,14 +21,12 @@ require 'spec_helper'
 
 describe 'boxbilling::mysql' do
   let(:mysql_service) { 'mysql_service_name' }
-  let(:chef_run) do
-    ChefSpec::Runner.new do |node|
-      node.set['mysql']['service_name'] = mysql_service
-    end.converge(described_recipe)
-  end
+  let(:chef_runner) { ChefSpec::SoloRunner.new }
+  let(:chef_run) { chef_runner.converge(described_recipe) }
+  let(:node) { chef_runner.node }
+  before { node.set['mysql']['service_name'] = mysql_service }
 
   it 'installs mysql' do
     expect(chef_run).to create_mysql_service(mysql_service)
   end
-
 end

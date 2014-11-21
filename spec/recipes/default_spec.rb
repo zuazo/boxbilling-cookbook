@@ -30,14 +30,9 @@ describe 'boxbilling::default' do
   let(:db_name) { 'boxbilling_database' }
   let(:db_user) { 'boxbilling_user' }
   let(:db_password) { 'boxbilling_pass' }
-  let(:chef_run) do
-    ChefSpec::Runner.new do |node|
-      node.set['boxbilling']['config']['db_name'] = db_name
-      node.set['boxbilling']['config']['db_user'] = db_user
-      node.set['boxbilling']['config']['db_password'] = db_password
-      node.set['boxbilling']['admin']['pass'] = 'admin'
-    end.converge(described_recipe)
-  end
+  let(:chef_runner) { ChefSpec::SoloRunner.new }
+  let(:chef_run) { chef_runner.converge(described_recipe) }
+  let(:node) { chef_runner.node }
   before do
     allow(Kernel).to receive(:require).with('sequel')
     allow_any_instance_of(Chef::Recipe).to receive(:database_empty?)
@@ -45,6 +40,11 @@ describe 'boxbilling::default' do
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
       .and_return('4.0.0')
     stub_command('/usr/sbin/apache2 -t').and_return(true)
+
+    node.set['boxbilling']['config']['db_name'] = db_name
+    node.set['boxbilling']['config']['db_user'] = db_user
+    node.set['boxbilling']['config']['db_password'] = db_password
+    node.set['boxbilling']['admin']['pass'] = 'admin'
   end
 
   it 'installs unzip package' do
@@ -263,5 +263,4 @@ describe 'boxbilling::default' do
       expect(chef_run).to_not create_template('api-config.php')
     end
   end
-
 end
