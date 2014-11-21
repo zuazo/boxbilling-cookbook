@@ -50,13 +50,13 @@ attribute 'boxbilling/download_url',
   :display_name => 'boxbilling download url',
   :description => 'BoxBilling download URL.',
   :type => 'string',
-  :default => '"http://www.boxbilling.com/version/latest.zip"'
+  :default => 'http://www.boxbilling.com/version/latest.zip'
 
 attribute 'boxbilling/required_packages',
   :display_name => 'boxbilling required packages',
   :description => 'BoxBilling required packages.',
-  :type => 'string',
-  :default => '%w(unzip)'
+  :type => 'array',
+  :default => %w(unzip)
 
 attribute 'boxbilling/php_packages',
   :display_name => 'boxbilling php packages',
@@ -68,39 +68,39 @@ attribute 'boxbilling/dir',
   :display_name => 'boxbilling directory',
   :description => 'BoxBilling installation directory.',
   :type => 'string',
-  :default => '"/srv/www/boxbilling"'
+  :default => '/srv/www/boxbilling'
 
 attribute 'boxbilling/server_name',
   :display_name => 'boxbilling server',
   :description => 'BoxBilling server name.',
   :type => 'string',
-  :default => 'node["fqdn"]'
+  :calculated => true
 
 attribute 'boxbilling/cron_enabled',
   :display_name => 'boxbilling cron enabled',
   :description => 'Whether to enable BoxBilling cron job.',
   :type => 'string',
-  :choice => [ 'true', 'false' ],
+  :choice => %w(true false),
   :default => 'true'
 
 attribute 'boxbilling/headers',
   :display_name => 'boxbilling headers',
   :description => 'BoxBilling HTTP headers to set as hash.',
-  :type => 'string',
-  :default => '{}'
+  :type => 'hash',
+  :default => {}
 
 attribute 'boxbilling/ssl',
   :display_name => 'boxbilling ssl',
   :description => 'Whether to enable SSL in BoxBilling.',
   :type => 'string',
-  :choice => [ 'true', 'false' ],
+  :choice => %w(true false),
   :default => 'true'
 
 attribute 'boxbilling/encrypt_attributes',
   :display_name => 'boxbilling encrypt attributes',
   :description => 'Whether to encrypt BoxBilling attributes containing credential secrets.',
   :type => 'string',
-  :choice => [ 'true', 'false' ],
+  :choice => %w(true false),
   :default => 'false'
 
 attribute 'boxbilling/admin/email',
@@ -119,25 +119,25 @@ attribute 'boxbilling/config/timezone',
   :display_name => 'boxbilling config timezone',
   :description => 'BoxBilling timezone. See http://php.net/manual/en/timezones.php.',
   :type => 'string',
-  :default => '"America/New_York"'
+  :default => 'America/New_York'
 
 attribute 'boxbilling/config/db_host',
   :display_name => 'boxbilling config db host',
   :description => 'BoxBilling database host.',
   :type => 'string',
-  :default => '"localhost"'
+  :default => 'localhost'
 
 attribute 'boxbilling/config/db_name',
   :display_name => 'boxbilling config db name',
   :description => 'BoxBilling database name.',
   :type => 'string',
-  :default => '"boxbilling"'
+  :default => 'boxbilling'
 
 attribute 'boxbilling/config/db_user',
   :display_name => 'boxbilling config db user',
   :description => 'BoxBilling database user.',
   :type => 'string',
-  :default => '"boxbilling"'
+  :default => 'boxbilling'
 
 attribute 'boxbilling/config/db_password',
   :display_name => 'boxbilling config db password',
@@ -162,34 +162,34 @@ attribute 'boxbilling/config/locale',
   :display_name => 'boxbilling config locale',
   :description => 'BoxBilling locale.',
   :type => 'string',
-  :default => '"en_US"'
+  :default => 'en_US'
 
 attribute 'boxbilling/config/sef_urls',
   :display_name => 'boxbilling config sef urls',
   :description => 'Whether to enable BoxBilling search engine friendly URLs.',
   :type => 'string',
-  :choice => [ 'true', 'false' ],
+  :choice => %w(true false),
   :default => 'false'
 
 attribute 'boxbilling/config/debug',
   :display_name => 'boxbilling config debug',
   :description => 'Whether to enable BoxBilling debug.',
   :type => 'string',
-  :choice => [ 'true', 'false' ],
+  :choice => %w(true false),
   :default => 'false'
 
 attribute 'boxbilling/api_config/require_referer_header',
   :display_name => 'boxbilling api config require referer header',
   :description => 'Whether to enable require referer header in the API.',
   :type => 'string',
-  :choice => [ 'true', 'false' ],
+  :choice => %w(true false),
   :default => 'true'
 
 attribute 'boxbilling/api_config/allowed_ips',
   :display_name => 'boxbilling api config allowed ips',
   :description => 'BoxBilling allowed IP addresses to access the API. Empty array will allow all IPs to access the API.',
-  :type => 'string',
-  :default => '[]'
+  :type => 'array',
+  :default => []
 
 attribute 'boxbilling/api_config/rate_span',
   :display_name => 'boxbilling api config rate span',
