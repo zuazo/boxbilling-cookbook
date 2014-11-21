@@ -1,5 +1,3 @@
-self.class.send(:include, ::BoxBilling::RecipeHelpers)
-
 def whyrun_supported?
   true
 end
@@ -118,6 +116,13 @@ def path_supports?(path, action)
   return true
 end
 
+def boxbilling_old_api
+  @old_api ||= begin
+    self.class.send(:include, ::BoxBilling::RecipeHelpers)
+    boxbilling_lt4?
+  end
+end
+
 def boxbilling_api_request(action=nil, args={})
   opts = {
     :path => path_with_action(new_resource.path, action),
@@ -131,7 +136,7 @@ def boxbilling_api_request(action=nil, args={})
 
   if node['boxbilling']['config']['sef_urls']
     opts[:endpoint] = '/api%{path}'
-  elsif boxbilling_lt4?
+  elsif boxbilling_old_api
     opts[:endpoint] = '/index.php/api%{path}'
   else
     opts[:endpoint] = '/index.php?_url=/api%{path}'
