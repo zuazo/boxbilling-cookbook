@@ -27,7 +27,7 @@ describe 'boxbilling::mysql' do
     end.converge(described_recipe)
   end
 
-  it 'should install mysql' do
+  it 'installs mysql' do
     expect(chef_run).to create_mysql_service(mysql_service)
   end
 

@@ -32,11 +32,11 @@ describe 'boxbilling::api' do
     allow(Kernel).to receive(:require).with('sequel')
   end
 
-  it 'should install sequel gem' do
+  it 'installs sequel gem' do
     expect(chef_run).to install_chef_gem('sequel')
   end
 
-  it 'should require sequel gem' do
+  it 'requires sequel gem' do
     expect(Kernel).to receive(:require).with('sequel').once
     chef_run
   end

@@ -6,6 +6,7 @@ Testing
 * `vagrant`
 * `foodcritic`
 * `berkshelf`
+* `should_not`
 * `chefspec`
 * `test-kitchen`
 * `kitchen-vagrant`

@@ -47,33 +47,33 @@ describe 'boxbilling::default' do
     stub_command('/usr/sbin/apache2 -t').and_return(true)
   end
 
-  it 'should install unzip package' do
+  it 'installs unzip package' do
     expect(chef_run).to install_package('unzip')
   end
 
-  it 'should include php recipe' do
+  it 'includes php recipe' do
     expect(chef_run).to include_recipe('php')
   end
 
   %w(php5-curl php5-mcrypt php5-mysql).each do |pkg|
-    it "should install #{pkg} package" do
+    it "installs #{pkg} package" do
       expect(chef_run).to install_package(pkg)
     end
   end
 
-  it 'should include boxbilling::mysql recipe' do
+  it 'includes boxbilling::mysql recipe' do
     expect(chef_run).to include_recipe('boxbilling::mysql')
   end
 
-  it 'should include database::mysql recipe' do
+  it 'includes database::mysql recipe' do
     expect(chef_run).to include_recipe('database::mysql')
   end
 
-  it 'should create mysql database' do
+  it 'creates mysql database' do
     expect(chef_run).to create_mysql_database(db_name)
   end
 
-  it 'should create mysql database user' do
+  it 'creates mysql database user' do
     expect(chef_run).to grant_mysql_database_user(db_user)
       .with_database_name(db_name)
       .with_host('localhost')
@@ -81,18 +81,18 @@ describe 'boxbilling::default' do
       .with_privileges([:all])
   end
 
-  it 'should create boxbilling main directory' do
+  it 'creates boxbilling main directory' do
     expect(chef_run).to create_directory('/srv/www/boxbilling')
   end
 
-  it 'should download boxbilling' do
+  it 'downloads boxbilling' do
     expect(chef_run).to create_remote_file_if_missing('download boxbilling')
       .with_path(
         ::File.join(Chef::Config[:file_cache_path], 'BoxBilling-4.0.0.zip')
       )
   end
 
-  it 'should extract boxbilling' do
+  it 'extracts boxbilling' do
     expect(chef_run).to run_execute('extract boxbilling')
       .with_command(/^unzip /)
       .with_creates(/\/index\.php$/)
@@ -104,13 +104,13 @@ describe 'boxbilling::default' do
     apache2::mod_rewrite
     apache2::mod_headers
   ). each do |recipe|
-    it "should include #{recipe} recipe" do
+    it "includes #{recipe} recipe" do
       expect(chef_run).to include_recipe(recipe)
     end
   end
 
   context 'apache_site default definition' do
-    it 'should disable default site' do
+    it 'disables default site' do
       allow(::File).to receive(:symlink?).with(any_args).and_return(false)
       allow(::File).to receive(:symlink?).with(/sites-enabled\/default\.conf$/).and_return(true)
       expect(chef_run).to run_execute('a2dissite default.conf')
@@ -118,23 +118,23 @@ describe 'boxbilling::default' do
   end
 
   context 'web_app boxbilling definition' do
-    it 'should create apache2 site' do
+    it 'creates apache2 site' do
       expect(chef_run).to create_template(/\/sites-available\/boxbilling\.conf$/)
     end
   end
 
   context 'ssl' do
 
-    it 'should create ssl certificate' do
+    it 'creates ssl certificate' do
       expect(chef_run).to create_ssl_certificate('boxbilling')
     end
 
-    it 'should include apache2::mod_ssl recipe' do
+    it 'includes apache2::mod_ssl recipe' do
       expect(chef_run).to include_recipe('apache2::mod_ssl')
     end
 
     context 'web_app boxbilling-ssl definition' do
-      it 'should create apache2 site' do
+      it 'creates apache2 site' do
         expect(chef_run).to create_template(
           end_with('/sites-available/boxbilling.conf')
         )
@@ -151,7 +151,7 @@ describe 'boxbilling::default' do
       /bb-themes/boxbilling/assets
       /bb-themes/huraga/assets
     ).each do |dir|
-      it "should set #{dir} directory writable" do
+      it "sets #{dir} directory writable" do
         expect(chef_run).to create_directory(end_with(dir))
           .with_recursive(true)
           .with_owner('www-data')
@@ -166,7 +166,7 @@ describe 'boxbilling::default' do
       /bb-themes/boxbilling/config/settings.html
       /bb-themes/boxbilling/config/settings_data.json
     ).each do |file|
-      it "should set #{file} file writable" do
+      it "sets #{file} file writable" do
         expect(chef_run).to touch_file(end_with(file))
           .with_owner('www-data')
           .with_group('www-data')
@@ -175,26 +175,26 @@ describe 'boxbilling::default' do
     end
   end
 
-  it 'should create bb-config.php file' do
+  it 'creates bb-config.php file' do
     expect(chef_run).to create_template('bb-config.php')
       .with_owner('www-data')
       .with_group('www-data')
       .with_mode(00640)
   end
 
-  it 'should create .htaccess file' do
+  it 'creates .htaccess file' do
     expect(chef_run).to create_template('boxbilling .htaccess')
       .with_owner('www-data')
       .with_group('www-data')
       .with_mode(00640)
   end
 
-  it 'should create database content' do
+  it 'creates database content' do
     expect(chef_run).to query_mysql_database('create database content')
       .with_database_name(db_name)
   end
 
-  it 'create database content should notify create admin user' do
+  it 'create database content notifies create admin user' do
     resource = chef_run.find_resource(
       'mysql_database', 'create database content'
     )
@@ -202,23 +202,23 @@ describe 'boxbilling::default' do
       .immediately
   end
 
-  it 'should do nothing with create admin user' do
+  it 'does do nothing with create admin user' do
     resource = chef_run.find_resource('boxbilling_api', 'create admin user')
     expect(resource).to do_nothing
   end
 
-  it 'should remove installation dir' do
+  it 'removes installation dir' do
     expect(chef_run).to delete_directory(end_with('/install'))
   end
 
-  it 'should enable bb-cron.php cron file' do
+  it 'enables bb-cron.php cron file' do
     expect(chef_run).to create_cron('boxbilling cron')
       .with_user('www-data')
       .with_minute('*/5')
       .with_command(/^php -f '.*\/bb-cron.php'$/)
   end
 
-  it 'should include boxbilling::api recipe' do
+  it 'includes boxbilling::api recipe' do
     expect(chef_run).to include_recipe('boxbilling::api')
   end
 
@@ -228,16 +228,16 @@ describe 'boxbilling::default' do
         .and_return('3.0.0')
     end
 
-    it 'should download ioncube' do
+    it 'downloads ioncube' do
       expect(chef_run).to create_remote_file_if_missing('download ioncube')
         .with_path(::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz'))
     end
 
-    it 'should install ioncube' do
+    it 'installs ioncube' do
       expect(chef_run).to run_execute('install ioncube')
         .with_creates(/ioncube\.ini$/)
     end
-    it 'should create api-config.php file' do
+    it 'creates api-config.php file' do
       expect(chef_run).to create_template('api-config.php')
         .with_owner('www-data')
         .with_group('www-data')
@@ -251,14 +251,15 @@ describe 'boxbilling::default' do
         .and_return('4.0.0')
     end
 
-    it 'should not download ioncube' do
+    it 'does not download ioncube' do
       expect(chef_run).to_not create_remote_file_if_missing('download ioncube')
     end
 
-    it 'should not install ioncube' do
+    it 'does not install ioncube' do
       expect(chef_run).to_not run_execute('install ioncube')
     end
-    it 'should not create api-config.php file' do
+
+    it 'does not create api-config.php file' do
       expect(chef_run).to_not create_template('api-config.php')
     end
   end
