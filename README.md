@@ -387,9 +387,7 @@ end
 (1..3).each do |id|
   boxbilling_api "admin/news delete #{id}" do
     path 'admin/news'
-    data(
-      id: id
-    )
+    data id: id
     action :delete
   end
 end
