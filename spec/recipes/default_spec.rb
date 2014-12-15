@@ -150,7 +150,6 @@ describe 'boxbilling::default' do
       /bb-data/log
       /bb-data/uploads
       /bb-themes/boxbilling/assets
-      /bb-themes/huraga/assets
     ).each do |dir|
       it "sets #{dir} directory writable" do
         expect(chef_run).to create_directory(end_with(dir))
@@ -164,7 +163,6 @@ describe 'boxbilling::default' do
 
   context 'writable files' do
     %w(
-      /bb-themes/boxbilling/config/settings.html
       /bb-themes/boxbilling/config/settings_data.json
     ).each do |file|
       it "sets #{file} file writable" do
@@ -244,6 +242,14 @@ describe 'boxbilling::default' do
         .with_group('www-data')
         .with_mode(00640)
     end
+
+    it 'does not set /bb-themes/huraga/assets directory writable' do
+      expect(chef_run).to_not create_directory(end_with('/bb-themes/huraga/assets'))
+    end
+
+    it 'does not set /bb-themes/huraga/config/settings_data.json file writable' do
+      expect(chef_run).to_not touch_file(end_with('/bb-themes/huraga/config/settings_data.json'))
+    end
   end
 
   context 'with boxbilling4' do
@@ -262,6 +268,21 @@ describe 'boxbilling::default' do
 
     it 'does not create api-config.php file' do
       expect(chef_run).to_not create_template('api-config.php')
+    end
+
+    it 'sets /bb-themes/huraga/assets directory writable' do
+      expect(chef_run).to create_directory(end_with('/bb-themes/huraga/assets'))
+        .with_recursive(true)
+        .with_owner('www-data')
+        .with_group('www-data')
+        .with_mode(00750)
+    end
+
+    it 'sets /bb-themes/huraga/config/settings_data.json file writable' do
+      expect(chef_run).to touch_file(end_with('/bb-themes/boxbilling/config/settings_data.json'))
+        .with_owner('www-data')
+        .with_group('www-data')
+        .with_mode(00640)
     end
   end
 end

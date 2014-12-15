@@ -197,13 +197,22 @@ end
 # Initialize configuration file
 #==============================================================================
 
+themes =
+  if boxbilling_lt4?
+    %w{ boxbilling }
+  else
+    %w{ boxbilling huraga }
+  end
+
 # set writable directories
-%w{ cache log uploads }.map do |data_dir|
-  ::File.join('bb-data', data_dir)
-end.concat([
-  ::File.join('bb-themes', 'boxbilling', 'assets'),
-  ::File.join('bb-themes', 'huraga', 'assets'),
-]).each do |dir|
+(
+  %w{ cache log uploads }.map do |data_dir|
+    ::File.join('bb-data', data_dir)
+  end +
+  themes.map do |theme_dir|
+    ::File.join('bb-themes', theme_dir, 'assets')
+  end
+).each do |dir|
   directory ::File.join(node['boxbilling']['dir'], dir) do
     recursive true
     owner node['apache']['user']
@@ -214,10 +223,9 @@ end.concat([
 end
 
 # set writable files
-[
-  ::File.join('bb-themes', 'boxbilling', 'config', 'settings.html'),
-  ::File.join('bb-themes', 'boxbilling', 'config', 'settings_data.json'),
-].each do |dir|
+themes.map do |theme_dir|
+  ::File.join('bb-themes', theme_dir, 'config', 'settings_data.json')
+end.each do |dir|
   file ::File.join(node['boxbilling']['dir'], dir) do
     owner node['apache']['user']
     group node['apache']['group']
