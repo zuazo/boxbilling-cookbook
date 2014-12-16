@@ -33,7 +33,7 @@ supports 'debian'
 supports 'ubuntu'
 
 depends 'apache2'
-depends 'database'
+depends 'database', '>= 2.3.1'
 depends 'encrypted_attributes', '~> 0.2'
 depends 'mysql', '~> 5.0'
 depends 'openssl'
