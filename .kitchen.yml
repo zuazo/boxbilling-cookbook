@@ -47,4 +47,4 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.11.11/BoxBilling.zip
+      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.12/BoxBilling.zip
