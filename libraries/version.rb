@@ -27,7 +27,7 @@ module BoxBilling
   # Get BoxBilling version number from URL
   module Version
     unless defined?(::BoxBilling::Version::VERSION_REGEX)
-      VERSION_REGEX = /\b\d+\.\d+\.\d+\b/
+      VERSION_REGEX = /\b\d+\.\d+(\.\d+)?\b/
     end
 
     def self.from_url_headers(url)
