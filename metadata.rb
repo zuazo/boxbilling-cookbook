@@ -25,7 +25,7 @@ maintainer_email 'team@onddo.com'
 license          'Apache 2.0'
 description      'Installs and configures BoxBilling, invoice and client management software'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.2.0'
+version          '0.3.0' # WiP
 
 supports 'amazon'
 supports 'centos', '>= 6.0'
