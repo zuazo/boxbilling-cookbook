@@ -2,7 +2,7 @@ Description
 ===========
 [![Cookbook Version](https://img.shields.io/cookbook/v/boxbilling.svg?style=flat)](https://supermarket.getchef.com/cookbooks/boxbilling)
 [![Dependency Status](http://img.shields.io/gemnasium/onddo/boxbilling-cookbook.svg?style=flat)](https://gemnasium.com/onddo/boxbilling-cookbook)
-[![Build Status](http://img.shields.io/travis/onddo/boxbilling-cookbook.svg?style=flat)](https://travis-ci.org/onddo/boxbilling-cookbook)
+[![Build Status](http://img.shields.io/travis/onddo/boxbilling-cookbook/0.2.0.svg?style=flat)](https://travis-ci.org/onddo/boxbilling-cookbook)
 
 Chef cookbook to install and configure [BoxBilling](http://www.boxbilling.com/), invoice and client management software.
 
