@@ -164,15 +164,18 @@ def boxbilling_api_request(action=nil, args={})
     opts[:endpoint] = '/index.php?_url=/api%{path}'
   end
 
-  if args[:ignore_failure].nil? ? new_resource.ignore_failure : args[:ignore_failure]
-    begin
-      BoxBilling::API.request(opts)
-    rescue Exception => e
-      Chef::Log.warn("Ignored exception: #{e.to_s}")
-      nil
+  ignore_failure =
+    if args[:ignore_failure].nil?
+      new_resource.ignore_failure
+    else
+      args[:ignore_failure]
     end
-  else
+  begin
     BoxBilling::API.request(opts)
+  rescue Exception => e
+    raise e unless ignore_failure
+    Chef::Log.warn("Ignored exception: #{e.to_s}")
+    nil
   end
 end
 
