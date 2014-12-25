@@ -3,6 +3,10 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.2.1 (2014-12-25)
+
+* `boxbilling_api`: fix encrypted attributes decryption outside chef solo.
+
 ## v0.2.0 (2014-12-18)
 
 * Add BoxBilling `4` support.
