@@ -30,6 +30,8 @@ version          '0.3.0' # WiP
 supports 'amazon'
 supports 'centos', '>= 6.0'
 supports 'debian'
+supports 'fedora'
+supports 'redhat'
 supports 'ubuntu'
 
 depends 'apache2', '~> 3.0'

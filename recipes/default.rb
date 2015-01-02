@@ -54,9 +54,10 @@ end
 # Install PHP
 #==============================================================================
 
+include_recipe 'apache2::default' # required before php for Fedora support.
 include_recipe 'php'
 
-if %w{ redhat centos scientific fedora suse amazon oracle }.include?(node['platform'])
+if %w(centos scientific suse amazon oracle).include?(node['platform'])
   include_recipe 'yum-epel' # required by php-mcrypt
 end
 node['boxbilling']['php_packages'].each do |pkg|
@@ -147,7 +148,6 @@ end
 # Install Apache
 #==============================================================================
 
-include_recipe 'apache2::default'
 include_recipe 'apache2::mod_php5'
 include_recipe 'apache2::mod_rewrite'
 include_recipe 'apache2::mod_headers'
