@@ -43,4 +43,4 @@ RSpec.configure do |config|
   config.version = '12.04'
 end
 
-# at_exit { ChefSpec::Coverage.report! } # still in beta
+at_exit { ChefSpec::Coverage.report! }
