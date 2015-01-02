@@ -38,7 +38,7 @@ depends 'encrypted_attributes', '~> 0.2'
 depends 'mysql', '~> 5.0'
 depends 'openssl'
 depends 'php'
-depends 'ssl_certificate'
+depends 'ssl_certificate', '~> 1.1'
 depends 'yum-epel'
 
 recipe 'boxbilling::default', 'Installs and configures BoxBilling. Including the MySQL server if set to localhost.'

@@ -188,6 +188,8 @@ if node['boxbilling']['ssl']
     port '443'
     ssl_key cert.key_path
     ssl_cert cert.cert_path
+    ssl_chain cert.chain_path
+    ssl_ca cert.ca_cert_path
     allow_override 'All'
     enable true
   end
