@@ -2,4 +2,5 @@ TODO
 ====
 
 * [ ] Add unit tests for libraries.
-* [ ] Test in more platforms.
+* [ ] Fix RuboCop offenses.
+* [x] Test in more platforms.
