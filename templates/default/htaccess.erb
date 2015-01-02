@@ -48,8 +48,12 @@ RewriteRule ^(.*)$ index.php?_url=/$1 [QSA,L]
 <% end -%>
 
 <FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak|phtml|sql)$">
+<% if node['apache']['version'].to_f >= 2.4 -%>
+    Require all denied
+<% else -%>
     Order Allow,Deny
     Deny from all
+<% end -%>
 </FilesMatch>
 
 <IfModule mod_headers.c>
