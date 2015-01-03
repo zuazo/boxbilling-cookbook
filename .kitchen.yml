@@ -20,8 +20,6 @@ platforms:
   run_list: ["recipe[apt]"]
 - name: fedora-19
 - name: fedora-20
-- name: ubuntu-10.04
-  run_list: ["recipe[apt]"]
 - name: ubuntu-12.04
   run_list: ["recipe[apt]"]
 - name: ubuntu-14.04

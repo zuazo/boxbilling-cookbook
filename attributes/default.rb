@@ -20,6 +20,12 @@
 # limitations under the License.
 #
 
+# Fix for Ubuntu 14
+# https://github.com/opscode-cookbooks/php/pull/107
+if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 12.10
+  default['php']['ext_conf_dir'] = '/etc/php5/mods-available'
+end
+
 default['apt']['compile_time_update'] = true unless node['apt'].nil?
 
 default['boxbilling']['download_url'] = 'http://www.boxbilling.com/version/latest.zip'
