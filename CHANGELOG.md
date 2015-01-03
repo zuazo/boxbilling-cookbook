@@ -3,6 +3,18 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.3.0 (2015-01-03)
+
+* htaccess: Fix Apache `2.4` support.
+* Fix Ubuntu `14` support.
+* Add Fedora and RedHat support.
+* Add integration tests.
+* Update to use `ssl_certificate` cookbook version `1.1.0`.
+* metadata: Use pessimistic operator for cookbook versions.
+* Enable ChefSpec coverage.
+* Gemfile: Use foodcritic fixed version.
+* Update license year.
+
 ## v0.2.1 (2014-12-25)
 
 * `boxbilling_api`: fix encrypted attributes decryption outside chef solo.
