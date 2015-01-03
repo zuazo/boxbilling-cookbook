@@ -736,7 +736,7 @@ License and Author
 |:---------------------|:-----------------------------------------|
 | **Author:**          | [Raul Rodriguez](https://github.com/raulr) (<raul@onddo.com>)
 | **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@onddo.com>)
-| **Copyright:**       | Copyright (c) 2013-2014, Onddo Labs, SL. (www.onddo.com)
+| **Copyright:**       | Copyright (c) 2013-2015, Onddo Labs, SL. (www.onddo.com)
 | **License:**         | Apache License, Version 2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");
