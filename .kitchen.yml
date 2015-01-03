@@ -24,8 +24,6 @@ platforms:
   run_list: ["recipe[apt]"]
 - name: ubuntu-14.04
   run_list: ["recipe[apt]"]
-- name: ubuntu-14.10
-  run_list: ["recipe[apt]"]
 
 suites:
 - name: boxbilling3
