@@ -716,6 +716,51 @@ Testing
 
 See [TESTING.md](https://github.com/onddo/boxbilling-cookbook/blob/master/TESTING.md).
 
+## ChefSpec Matchers
+
+### boxbilling_api(path)
+
+Helper method for locating a `boxbilling_api` resource in the collection.
+
+```ruby
+resource = chef_run.boxbilling_api('admin/system/params')
+expect(resource)
+  .to notify('boxbilling_api[admin/system/params invoice starting_number]')
+  .to(:update).delayed
+```
+
+### request_boxbilling_api(path)
+
+Assert that the *Chef Run* makes a `boxbilling_api` request.
+
+```ruby
+expect(chef_run).to request_boxbilling_api(path)
+```
+
+### create_boxbilling_api(path)
+
+Assert that the *Chef Run* makes a `boxbilling_api` create request.
+
+```ruby
+expect(chef_run).to create_boxbilling_api(path)
+```
+
+### update_boxbilling_api(path)
+
+Assert that the *Chef Run* makes a `boxbilling_api` update request.
+
+```ruby
+expect(chef_run).to update_boxbilling_api(path)
+```
+
+### delete_boxbilling_api(path)
+
+Assert that the *Chef Run* makes a `boxbilling_api` delete request.
+
+```ruby
+expect(chef_run).to delete_boxbilling_api(path)
+```
+
 Contributing
 ============
 
