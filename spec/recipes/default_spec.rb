@@ -52,6 +52,10 @@ describe 'boxbilling::default' do
     expect(chef_run).to install_package('unzip')
   end
 
+  it 'includes boxbilling::_apache recipe' do
+    expect(chef_run).to include_recipe('boxbilling::_apache')
+  end
+
   it 'includes php recipe' do
     expect(chef_run).to include_recipe('php')
   end
@@ -99,51 +103,6 @@ describe 'boxbilling::default' do
       .with_creates(/\/index\.php$/)
   end
 
-  %w(
-    apache2::default
-    apache2::mod_php5
-    apache2::mod_rewrite
-    apache2::mod_headers
-  ). each do |recipe|
-    it "includes #{recipe} recipe" do
-      expect(chef_run).to include_recipe(recipe)
-    end
-  end
-
-  context 'apache_site default definition' do
-    it 'disables default site' do
-      allow(::File).to receive(:symlink?).with(any_args).and_return(false)
-      allow(::File).to receive(:symlink?).with(/sites-enabled\/default\.conf$/).and_return(true)
-      expect(chef_run).to run_execute('a2dissite default.conf')
-    end
-  end
-
-  context 'web_app boxbilling definition' do
-    it 'creates apache2 site' do
-      expect(chef_run).to create_template(/\/sites-available\/boxbilling\.conf$/)
-    end
-  end
-
-  context 'ssl' do
-
-    it 'creates ssl certificate' do
-      expect(chef_run).to create_ssl_certificate('boxbilling')
-    end
-
-    it 'includes apache2::mod_ssl recipe' do
-      expect(chef_run).to include_recipe('apache2::mod_ssl')
-    end
-
-    context 'web_app boxbilling-ssl definition' do
-      it 'creates apache2 site' do
-        expect(chef_run).to create_template(
-          end_with('/sites-available/boxbilling.conf')
-        )
-      end
-    end
-
-  end # context ssl
-
   context 'writable directories' do
     %w(
       /bb-data/cache
@@ -162,16 +121,42 @@ describe 'boxbilling::default' do
   end
 
   context 'writable files' do
-    %w(
-      /bb-themes/boxbilling/config/settings_data.json
-    ).each do |file|
-      it "sets #{file} file writable" do
-        expect(chef_run).to touch_file(end_with(file))
-          .with_owner('www-data')
-          .with_group('www-data')
-          .with_mode(00640)
+    context 'with boxbilling < 4' do
+      before do
+        allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
+          .and_return('4.0.0')
       end
-    end
+
+      %w(
+        /bb-themes/boxbilling/config/settings_data.json
+      ).each do |file|
+        it "sets #{file} file writable" do
+          expect(chef_run).to touch_file(end_with(file))
+            .with_owner('www-data')
+            .with_group('www-data')
+            .with_mode(00640)
+        end
+      end
+    end # context with boxbilling < 4
+
+    context 'with boxbilling >= 4' do
+      before do
+        allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
+          .and_return('4.0.0')
+      end
+
+      %w(
+        /bb-themes/boxbilling/config/settings_data.json
+        /bb-themes/huraga/config/settings_data.json
+      ).each do |file|
+        it "sets #{file} file writable" do
+          expect(chef_run).to touch_file(end_with(file))
+            .with_owner('www-data')
+            .with_group('www-data')
+            .with_mode(00640)
+        end
+      end
+    end # context with boxbilling >= 4
   end
 
   it 'creates bb-config.php file' do
@@ -221,21 +206,12 @@ describe 'boxbilling::default' do
     expect(chef_run).to include_recipe('boxbilling::api')
   end
 
-  context 'with boxbilling_lt4' do
+  context 'with boxbilling < 4' do
     before do
       allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
         .and_return('3.0.0')
     end
 
-    it 'downloads ioncube' do
-      expect(chef_run).to create_remote_file_if_missing('download ioncube')
-        .with_path(::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz'))
-    end
-
-    it 'installs ioncube' do
-      expect(chef_run).to run_execute('install ioncube')
-        .with_creates(/ioncube\.ini$/)
-    end
     it 'creates api-config.php file' do
       expect(chef_run).to create_template('api-config.php')
         .with_owner('www-data')
@@ -252,18 +228,10 @@ describe 'boxbilling::default' do
     end
   end
 
-  context 'with boxbilling4' do
+  context 'with boxbilling >= 4' do
     before do
       allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
         .and_return('4.0.0')
-    end
-
-    it 'does not download ioncube' do
-      expect(chef_run).to_not create_remote_file_if_missing('download ioncube')
-    end
-
-    it 'does not install ioncube' do
-      expect(chef_run).to_not run_execute('install ioncube')
     end
 
     it 'does not create api-config.php file' do
