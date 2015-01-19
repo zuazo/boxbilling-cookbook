@@ -25,9 +25,6 @@ describe 'boxbilling::_apache' do
   let(:chef_run) { chef_runner.converge(described_recipe) }
   let(:node) { chef_runner.node }
   before do
-    allow(Kernel).to receive(:require).with('sequel')
-    allow_any_instance_of(Chef::Recipe).to receive(:database_empty?)
-      .and_return(true)
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
       .and_return('4.0.0')
     stub_command('/usr/sbin/apache2 -t').and_return(true)
@@ -47,20 +44,21 @@ describe 'boxbilling::_apache' do
 
   context 'apache_site default definition' do
     it 'disables default site' do
-      allow(::File).to receive(:symlink?).with(any_args).and_return(false)
-      allow(::File).to receive(:symlink?).with(/sites-enabled\/default\.conf$/).and_return(true)
+      allow(::File).to receive(:symlink?).and_call_original
+      allow(::File).to receive(:symlink?)
+        .with(/sites-enabled\/default\.conf$/).and_return(true)
       expect(chef_run).to run_execute('a2dissite default.conf')
     end
   end
 
   context 'web_app boxbilling definition' do
     it 'creates apache2 site' do
-      expect(chef_run).to create_template(/\/sites-available\/boxbilling\.conf$/)
+      expect(chef_run)
+        .to create_template(/\/sites-available\/boxbilling\.conf$/)
     end
   end
 
   context 'ssl' do
-
     it 'creates ssl certificate' do
       expect(chef_run).to create_ssl_certificate('boxbilling')
     end
@@ -76,7 +74,6 @@ describe 'boxbilling::_apache' do
         )
       end
     end
-
   end # context ssl
 
   context 'with boxbilling < 4' do
@@ -87,7 +84,9 @@ describe 'boxbilling::_apache' do
 
     it 'downloads ioncube' do
       expect(chef_run).to create_remote_file_if_missing('download ioncube')
-        .with_path(::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz'))
+        .with_path(
+          ::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz')
+        )
     end
 
     it 'installs ioncube' do

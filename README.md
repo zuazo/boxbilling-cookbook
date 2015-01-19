@@ -92,6 +92,11 @@ Attributes
     <td><code>false</code></td>
   </tr>
   <tr>
+    <td><code>node['boxbilling']['web_server']</code></td>
+    <td>Web server to use: <code>'apache'</code> or <code>'nginx'</code></td>
+    <td><code>'apache'</code></td>
+  </tr>
+  <tr>
     <td><code>node['boxbilling']['admin']['email']</code></td>
     <td>BoxBilling admin email.</td>
     <td><code>"admin@#{node['boxbilling']['server_name']}"</code></td>

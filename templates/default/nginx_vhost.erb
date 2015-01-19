@@ -1,0 +1,51 @@
+server {
+  listen <%= @port ? @port : '80' %>;
+  <% if @ssl -%>
+  <%= render 'nginx.erb', cookbook: 'ssl_certificate' %>
+  <% end -%>
+
+  set $root_path '<%= @docroot %>';
+  server_name <%=
+    server_names = []
+    server_names.push @server_name  if @server_name.kind_of? String
+    server_names += @server_aliases if @server_aliases.kind_of? Array
+    server_names.join ' '
+  %>;
+
+  index index.html index.htm index.php;
+  root $root_path;
+  try_files $uri $uri/ @rewrite;
+  sendfile off;
+
+  location @rewrite {
+     rewrite ^/(.*)$ /index.php?_url=/$1;
+  }
+
+  location ~ ^(.+?\.php)(/.*)?$ {
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
+
+    include fastcgi_params;
+    fastcgi_param PATH_INFO       $fastcgi_path_info;
+    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    <% if @ssl -%>
+    fastcgi_param HTTPS on;
+    <% end -%>
+    fastcgi_intercept_errors on;
+
+    fastcgi_pass <%= @fastcgi_pass %>;
+  }
+
+  location ~* ^/(css|img|js|flv|swf|download)/(.+)$ {
+    root $root_path;
+    expires off;
+    proxy_no_cache 1;
+    <% if Chef::VersionConstraint.new('>= 0.8.46')
+          .include?(node['nginx']['version']) -%>
+    proxy_cache_bypass 1;
+    <% end -%>
+  }
+
+  location ~ /\.ht {
+    deny all;
+  }
+}

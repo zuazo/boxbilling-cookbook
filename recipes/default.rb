@@ -22,6 +22,7 @@
 
 Chef::Recipe.send(:include, Chef::EncryptedAttributesHelpers)
 Chef::Recipe.send(:include, ::BoxBilling::RecipeHelpers)
+Chef::Resource.send(:include, ::BoxBilling::RecipeHelpers)
 recipe = self
 
 #==============================================================================
@@ -51,25 +52,6 @@ salt = encrypted_attribute_write(%w(boxbilling config salt)) do
 end
 
 #==============================================================================
-# Install Web Server
-#==============================================================================
-
-include_recipe 'boxbilling::_apache'
-
-#==============================================================================
-# Install PHP
-#==============================================================================
-
-include_recipe 'php' # also included in ::_apache
-
-if %w(centos scientific suse amazon oracle).include?(node['platform'])
-  include_recipe 'yum-epel' # required by php-mcrypt
-end
-node['boxbilling']['php_packages'].each do |pkg|
-  package pkg
-end
-
-#==============================================================================
 # Install MySQL
 #==============================================================================
 
@@ -96,6 +78,27 @@ if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
     privileges [:all]
     action :grant
   end
+end
+
+#==============================================================================
+# Install Web Server
+#==============================================================================
+
+if %w(apache nginx).include?(web_server)
+  include_recipe "boxbilling::_#{web_server}"
+end
+
+#==============================================================================
+# Install PHP
+#==============================================================================
+
+include_recipe 'php' # also included in ::_apache
+
+if %w(centos scientific suse amazon oracle).include?(node['platform'])
+  include_recipe 'yum-epel' # required by php-mcrypt
+end
+node['boxbilling']['php_packages'].each do |pkg|
+  package pkg
 end
 
 #==============================================================================
@@ -142,8 +145,8 @@ themes =
 ).each do |dir|
   directory ::File.join(node['boxbilling']['dir'], dir) do
     recursive true
-    owner node['apache']['user']
-    group node['apache']['group']
+    owner web_user
+    group web_group
     mode 00750
     action :create
   end
@@ -154,8 +157,8 @@ themes.map do |theme_dir|
   ::File.join('bb-themes', theme_dir, 'config', 'settings_data.json')
 end.each do |dir|
   file ::File.join(node['boxbilling']['dir'], dir) do
-    owner node['apache']['user']
-    group node['apache']['group']
+    owner web_user
+    group web_group
     mode 00640
     action :touch
   end
@@ -169,8 +172,8 @@ template 'bb-config.php' do
   else
     source 'bb4/bb-config.php.erb'
   end
-  owner node['apache']['user']
-  group node['apache']['group']
+  owner web_user
+  group web_group
   mode 00640
   variables(
     :timezone => node['boxbilling']['config']['timezone'],
@@ -192,8 +195,8 @@ end
 template 'api-config.php' do
   path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api', 'api-config.php')
   source 'api-config.php.erb'
-  owner node['apache']['user']
-  group node['apache']['group']
+  owner web_user
+  group web_group
   mode 00640
   variables(
     config: node['boxbilling']['api_config']
@@ -205,14 +208,15 @@ end
 template 'boxbilling .htaccess' do
   path ::File.join(node['boxbilling']['dir'], '.htaccess')
   source 'htaccess.erb'
-  owner node['apache']['user']
-  group node['apache']['group']
+  owner web_user
+  group web_group
   mode 00640
   variables(
     :domain => node['boxbilling']['server_name'].gsub(/^www\./, ''),
     :sef_urls => node['boxbilling']['config']['sef_urls'],
     :boxbilling_lt4 => recipe.boxbilling_lt4?
   )
+  only_if { web_server == 'apache' }
 end
 
 # create database content
@@ -261,13 +265,13 @@ end
 
 if node['boxbilling']['cron_enabled']
   cron 'boxbilling cron' do
-    user node['apache']['user']
+    user web_user
     minute '*/5'
     command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
   end
 else
   cron 'boxbilling cron' do
-    user node['apache']['user']
+    user web_user
     command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
     action :delete
   end

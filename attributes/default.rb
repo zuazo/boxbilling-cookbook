@@ -49,6 +49,7 @@ default['boxbilling']['headers'] = {}
 
 default['boxbilling']['ssl'] = true
 default['boxbilling']['encrypt_attributes'] = false
+default['boxbilling']['web_server'] = 'apache'
 
 default['boxbilling']['admin']['email'] = "admin@#{node['boxbilling']['server_name']}"
 default['boxbilling']['admin']['pass'] = nil

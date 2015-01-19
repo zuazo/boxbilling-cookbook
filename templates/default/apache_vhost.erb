@@ -44,7 +44,7 @@
   ErrorLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-error.log
   CustomLog <%= node['apache']['log_dir'] %>/<%= @params[:name] %>-access.log combined
 
-<% if @params[:port].to_s == '443' -%>
+<% if @params[:ssl] -%>
   <%= render 'apache.erb', cookbook: 'ssl_certificate', variables: @params.merge(node: node) %>
 <% end -%>
 </VirtualHost>

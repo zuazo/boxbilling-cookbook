@@ -2,7 +2,7 @@
 #
 # Author:: Raul Rodriguez (<raul@onddo.com>)
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,20 +52,6 @@ describe 'boxbilling::default' do
     expect(chef_run).to install_package('unzip')
   end
 
-  it 'includes boxbilling::_apache recipe' do
-    expect(chef_run).to include_recipe('boxbilling::_apache')
-  end
-
-  it 'includes php recipe' do
-    expect(chef_run).to include_recipe('php')
-  end
-
-  %w(php5-curl php5-mcrypt php5-mysql).each do |pkg|
-    it "installs #{pkg} package" do
-      expect(chef_run).to install_package(pkg)
-    end
-  end
-
   it 'includes boxbilling::mysql recipe' do
     expect(chef_run).to include_recipe('boxbilling::mysql')
   end
@@ -84,6 +70,20 @@ describe 'boxbilling::default' do
       .with_host('localhost')
       .with_password(db_password)
       .with_privileges([:all])
+  end
+
+  it 'includes boxbilling::_apache recipe' do
+    expect(chef_run).to include_recipe('boxbilling::_apache')
+  end
+
+  it 'includes php recipe' do
+    expect(chef_run).to include_recipe('php')
+  end
+
+  %w(php5-curl php5-mcrypt php5-mysql).each do |pkg|
+    it "installs #{pkg} package" do
+      expect(chef_run).to install_package(pkg)
+    end
   end
 
   it 'creates boxbilling main directory' do

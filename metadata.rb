@@ -35,12 +35,14 @@ supports 'redhat'
 supports 'ubuntu'
 
 depends 'apache2', '~> 3.0'
-depends 'database', '>= 2.3.1'
+depends 'database', '= 2.3.1'
 depends 'encrypted_attributes', '~> 0.2'
 depends 'mysql', '~> 5.0'
+depends 'nginx', '~> 2.7'
 depends 'openssl', '~> 2.0'
 depends 'php', '~> 1.5'
-depends 'ssl_certificate', '~> 1.1'
+depends 'php-fpm', '>= 0.7'
+depends 'ssl_certificate', '~> 1.2'
 depends 'yum-epel', '~> 0.5'
 
 recipe 'boxbilling::default', 'Installs and configures BoxBilling. Including the MySQL server if set to localhost.'
@@ -105,6 +107,14 @@ attribute 'boxbilling/encrypt_attributes',
   :type => 'string',
   :choice => %w(true false),
   :default => 'false'
+
+attribute 'boxbilling/web_server',
+          display_name: 'Web Server',
+          description: 'Web server to use: apache or nginx',
+          choice: %w(apache nginx),
+          type: 'string',
+          required: 'optional',
+          default: 'apache'
 
 attribute 'boxbilling/admin/email',
   :display_name => 'boxbilling admin email',

@@ -22,6 +22,9 @@
 
 Chef::Recipe.send(:include, ::BoxBilling::RecipeHelpers)
 
+include_recipe 'apache2::default' # required before php for Fedora support.
+include_recipe 'php'
+
 #==============================================================================
 # Install IonCube loader
 #==============================================================================
@@ -53,8 +56,6 @@ end
 # Install Apache
 #==============================================================================
 
-include_recipe 'apache2::default' # required before php for Fedora support.
-include_recipe 'php'
 include_recipe 'apache2::mod_php5'
 include_recipe 'apache2::mod_rewrite'
 include_recipe 'apache2::mod_headers'
@@ -93,6 +94,7 @@ if node['boxbilling']['ssl']
     server_aliases node['boxbilling']['server_aliases']
     headers node['boxbilling']['headers']
     port '443'
+    ssl true
     ssl_key cert.key_path
     ssl_cert cert.cert_path
     ssl_chain cert.chain_path

@@ -4,7 +4,7 @@
 # Library:: recipe_helpers
 # Author:: Raul Rodriguez (<raul@onddo.com>)
 # Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Copyright:: Copyright (c) 2014-2015 Onddo Labs, SL. (www.onddo.com)
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,14 +25,28 @@ require 'net/http'
 
 module BoxBilling
   module RecipeHelpers
+    def web_server
+      node['boxbilling']['web_server']
+    end
+
+    def web_user
+      return nil if web_server.nil?
+      node[web_server]['user']
+    end
+
+    def web_group
+      return nil if web_server.nil?
+      node[web_server]['group']
+    end
+
     def boxbilling_upload_cookbook_file(file)
       path = ::File.join(node['boxbilling']['dir'], 'bb-uploads', file)
 
       # Upload product images
       cookbook_file path do
         path path
-        owner node['apache']['user']
-        group node['apache']['group']
+        owner web_user
+        group web_group
         mode '00750'
       end
 
