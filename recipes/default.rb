@@ -26,6 +26,13 @@ Chef::Resource.send(:include, ::BoxBilling::RecipeHelpers)
 recipe = self
 
 #==============================================================================
+# Configure PHP
+#==============================================================================
+
+node.default['php']['directives']['date.timezone'] =
+  node['boxbilling']['config']['timezone']
+
+#==============================================================================
 # Install packages needed by the recipe
 #==============================================================================
 
@@ -84,8 +91,8 @@ end
 # Install Web Server
 #==============================================================================
 
-if %w(apache nginx).include?(web_server)
-  include_recipe "boxbilling::_#{web_server}"
+if %w(apache nginx).include?(boxbilling_web_server)
+  include_recipe "boxbilling::_#{boxbilling_web_server}"
 end
 
 #==============================================================================
@@ -145,8 +152,8 @@ themes =
 ).each do |dir|
   directory ::File.join(node['boxbilling']['dir'], dir) do
     recursive true
-    owner web_user
-    group web_group
+    owner boxbilling_web_user
+    group boxbilling_web_group
     mode 00750
     action :create
   end
@@ -157,8 +164,8 @@ themes.map do |theme_dir|
   ::File.join('bb-themes', theme_dir, 'config', 'settings_data.json')
 end.each do |dir|
   file ::File.join(node['boxbilling']['dir'], dir) do
-    owner web_user
-    group web_group
+    owner boxbilling_web_user
+    group boxbilling_web_group
     mode 00640
     action :touch
   end
@@ -172,8 +179,8 @@ template 'bb-config.php' do
   else
     source 'bb4/bb-config.php.erb'
   end
-  owner web_user
-  group web_group
+  owner boxbilling_web_user
+  group boxbilling_web_group
   mode 00640
   variables(
     :timezone => node['boxbilling']['config']['timezone'],
@@ -195,8 +202,8 @@ end
 template 'api-config.php' do
   path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api', 'api-config.php')
   source 'api-config.php.erb'
-  owner web_user
-  group web_group
+  owner boxbilling_web_user
+  group boxbilling_web_group
   mode 00640
   variables(
     config: node['boxbilling']['api_config']
@@ -208,15 +215,15 @@ end
 template 'boxbilling .htaccess' do
   path ::File.join(node['boxbilling']['dir'], '.htaccess')
   source 'htaccess.erb'
-  owner web_user
-  group web_group
+  owner boxbilling_web_user
+  group boxbilling_web_group
   mode 00640
   variables(
     :domain => node['boxbilling']['server_name'].gsub(/^www\./, ''),
     :sef_urls => node['boxbilling']['config']['sef_urls'],
     :boxbilling_lt4 => recipe.boxbilling_lt4?
   )
-  only_if { web_server == 'apache' }
+  only_if { boxbilling_web_server == 'apache' }
 end
 
 # create database content
@@ -236,8 +243,8 @@ mysql_database 'create database content' do
     ::File.exists?(content_sql) ? sql + ::File.open(content_sql).read : sql
   end
   action :query
-  only_if { recipe.database_empty? }
-  notifies :restart, 'service[apache2]', :immediately
+  only_if { recipe.boxbilling_database_empty? }
+  notifies :restart, "service[#{boxbilling_web_service}]", :immediately
   notifies :create, 'boxbilling_api[create admin user]', :immediately
 end
 
@@ -265,13 +272,13 @@ end
 
 if node['boxbilling']['cron_enabled']
   cron 'boxbilling cron' do
-    user web_user
+    user boxbilling_web_user
     minute '*/5'
     command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
   end
 else
   cron 'boxbilling cron' do
-    user web_user
+    user boxbilling_web_user
     command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
     action :delete
   end

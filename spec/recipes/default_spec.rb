@@ -36,7 +36,7 @@ describe 'boxbilling::default' do
   let(:node) { chef_runner.node }
   before do
     allow(Kernel).to receive(:require).with('sequel')
-    allow_any_instance_of(Chef::Recipe).to receive(:database_empty?)
+    allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_database_empty?)
       .and_return(true)
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
       .and_return('4.0.0')

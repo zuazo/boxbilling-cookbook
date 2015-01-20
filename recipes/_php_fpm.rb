@@ -21,12 +21,11 @@
 
 include_recipe 'php-fpm'
 
-web_server = node['boxbilling']['web_server']
-
 php_fpm_pool node['boxbilling']['php-fpm']['pool'] do
-  user node[web_server]['user']
-  group node[web_server]['group']
-  listen_owner node[web_server]['user']
-  listen_group node[web_server]['group']
+  self.class.send(:include, ::BoxBilling::RecipeHelpers)
+  user boxbilling_web_user
+  group boxbilling_web_group
+  listen_owner boxbilling_web_user
+  listen_group boxbilling_web_group
   listen_mode '0660'
 end

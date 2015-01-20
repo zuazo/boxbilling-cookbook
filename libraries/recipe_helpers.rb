@@ -25,18 +25,22 @@ require 'net/http'
 
 module BoxBilling
   module RecipeHelpers
-    def web_server
+    def boxbilling_web_server
       node['boxbilling']['web_server']
     end
 
-    def web_user
-      return nil if web_server.nil?
-      node[web_server]['user']
+    def boxbilling_web_service
+      boxbilling_web_server == 'apache' ? 'apache2' : boxbilling_web_server
     end
 
-    def web_group
-      return nil if web_server.nil?
-      node[web_server]['group']
+    def boxbilling_web_user
+      return nil if boxbilling_web_server.nil?
+      node[boxbilling_web_server]['user']
+    end
+
+    def boxbilling_web_group
+      return nil if boxbilling_web_server.nil?
+      node[boxbilling_web_server]['group']
     end
 
     def boxbilling_upload_cookbook_file(file)
@@ -45,8 +49,8 @@ module BoxBilling
       # Upload product images
       cookbook_file path do
         path path
-        owner web_user
-        group web_group
+        owner boxbilling_web_user
+        group boxbilling_web_group
         mode '00750'
       end
 
@@ -64,7 +68,7 @@ module BoxBilling
       boxbilling_version.to_i < 4
     end
 
-    def database_empty?
+    def boxbilling_database_empty?
       db_password = encrypted_attribute_read(%w(boxbilling config db_password))
       BoxBilling::Database.new({
         :host     => node['boxbilling']['config']['db_host'],

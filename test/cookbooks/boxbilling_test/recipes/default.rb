@@ -25,6 +25,7 @@ node.default['mysql']['server_debian_password'] = 'vagrant_debian'
 node.default['mysql']['server_repl_password'] = 'vagrant_repl'
 
 node.default['boxbilling']['admin']['pass'] = 'admin_pass123'
+node.default['boxbilling']['config']['salt'] = 'salt123'
 node.default['boxbilling']['config']['db_password'] = 'database_pass'
 node.default['boxbilling']['config']['license'] = 'dummy_license'
 node.default['boxbilling']['config']['url'] = 'http://localhost:8080/'
