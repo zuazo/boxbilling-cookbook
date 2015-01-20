@@ -3,6 +3,12 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.4.0 (2015-01-20)
+
+* Add nginx support.
+* Small improvements.
+* Unit tests against Chef 11 and 12.
+
 ## v0.3.0 (2015-01-03)
 
 * htaccess: Fix Apache `2.4` support.
