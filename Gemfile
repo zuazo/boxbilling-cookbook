@@ -4,6 +4,8 @@
 
 source 'https://rubygems.org'
 
+chef_version = ENV.key?('CHEF_VERSION') ? ENV['CHEF_VERSION'] : nil
+
 group :test do
   gem 'rake'
   gem 'rspec', '~> 3.0'
