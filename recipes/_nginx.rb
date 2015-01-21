@@ -28,11 +28,6 @@ service 'apache2' do
   only_if { ::File.exist?('/etc/init.d/apache2') }
 end
 
-# Disable default site
-nginx_site 'default' do
-  enable false
-end
-
 fastcgi_pass =
   "unix:/var/run/php-fpm-#{node['boxbilling']['php-fpm']['pool']}.sock"
 
