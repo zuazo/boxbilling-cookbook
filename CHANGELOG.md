@@ -3,6 +3,10 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.4.1 (2015-01-21)
+
+* Fix disabling nginx default site.
+
 ## v0.4.0 (2015-01-20)
 
 * Add nginx support.
