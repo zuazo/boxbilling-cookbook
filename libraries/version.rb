@@ -50,5 +50,18 @@ module BoxBilling
       fail 'Cannot get BoxBilling version from download URL' if version.nil?
       version
     end
+
+    def self.from_install_dir(dir)
+      version_file = ::File.join(dir, 'bb-library', 'Box', 'Version.php')
+      return nil unless ::File.exist?(version_file) # not installed
+      version =
+        ::File.open(version_file) do |f|
+          f.grep(/(const\s+VERSION|@version)/) do |l|
+            VERSION_REGEX.match(l) ? Regexp.last_match[0] : nil
+          end
+        end.first
+      fail 'Cannot get BoxBilling version from install dir' if version.nil?
+      version
+    end
   end
 end

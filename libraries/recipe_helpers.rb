@@ -64,6 +64,11 @@ module BoxBilling
         ::BoxBilling::Version.from_url(download_url)
     end
 
+    def boxbilling_installed_version
+      node.run_state["boxbilling_installed_version_cache"] ||=
+        ::BoxBilling::Version.from_install_dir(node['boxbilling']['dir'])
+    end
+
     def boxbilling_lt4?
       boxbilling_version.to_i < 4
     end
@@ -76,6 +81,15 @@ module BoxBilling
         :user     => node['boxbilling']['config']['db_user'],
         :password => db_password,
       }).database_empty?
+    end
+
+    def boxbilling_fresh_install?
+      not ::File.exist?(::File.join(node['boxbilling']['dir'], 'index.php'))
+    end
+
+    def boxbilling_update?
+      return false unless boxbilling_installed_version
+      boxbilling_version != boxbilling_installed_version
     end
 
   end

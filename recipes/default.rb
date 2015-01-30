@@ -126,8 +126,9 @@ remote_file 'download boxbilling' do
 end
 
 execute 'extract boxbilling' do
-  command "unzip -q -u -o '#{local_file}' -d '#{node['boxbilling']['dir']}'"
-  creates ::File.join(node['boxbilling']['dir'], 'index.php')
+  command "unzip -q -o '#{local_file}' -d '#{node['boxbilling']['dir']}'"
+  only_if { recipe.boxbilling_update? or recipe.boxbilling_fresh_install? }
+  notifies :run, 'execute[update boxbilling]' if recipe.boxbilling_update?
 end
 
 #==============================================================================
@@ -282,6 +283,23 @@ else
     command "php -f '#{node['boxbilling']['dir']}/bb-cron.php'"
     action :delete
   end
+end
+
+#==============================================================================
+# Update BoxBilling
+#==============================================================================
+
+execute 'update boxbilling' do
+  cwd node['boxbilling']['dir']
+  command 'php bb-update.php >> bb-data/log/update.log'
+  action :nothing
+  notifies :run, 'execute[clear cache]'
+end
+
+execute 'clear cache' do
+  cache_files = ::File.join(node['boxbilling']['dir'], 'bb-data', 'cache', '*')
+  command "rm -rf '#{cache_files}'"
+  action :nothing
 end
 
 #==============================================================================
