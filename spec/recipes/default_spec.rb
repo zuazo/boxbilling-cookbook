@@ -40,6 +40,10 @@ describe 'boxbilling::default' do
       .and_return(true)
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
       .and_return('4.0.0')
+    allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_update?)
+        .and_return(false)
+    allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_fresh_install?)
+        .and_return(true)
     stub_command('/usr/sbin/apache2 -t').and_return(true)
 
     node.set['boxbilling']['config']['db_name'] = db_name
@@ -100,7 +104,6 @@ describe 'boxbilling::default' do
   it 'extracts boxbilling' do
     expect(chef_run).to run_execute('extract boxbilling')
       .with_command(/^unzip /)
-      .with_creates(/\/index\.php$/)
   end
 
   context 'writable directories' do
@@ -202,6 +205,16 @@ describe 'boxbilling::default' do
       .with_command(/^php -f '.*\/bb-cron.php'$/)
   end
 
+  it 'does nothing with update boxbilling' do
+    resource = chef_run.execute('update boxbilling')
+    expect(resource).to do_nothing
+  end
+
+  it 'does nothing with clear cache' do
+    resource = chef_run.execute('clear cache')
+    expect(resource).to do_nothing
+  end
+
   it 'includes boxbilling::api recipe' do
     expect(chef_run).to include_recipe('boxbilling::api')
   end
@@ -251,6 +264,23 @@ describe 'boxbilling::default' do
         .with_owner('www-data')
         .with_group('www-data')
         .with_mode(00640)
+    end
+  end
+
+  context 'with boxbilling update' do
+    before do
+      allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_update?)
+        .and_return(true)
+    end
+
+    it 'extract boxbilling notifies update boxbilling' do
+      resource = chef_run.execute('extract boxbilling')
+      expect(resource).to notify('execute[update boxbilling]').to(:run)
+    end
+
+    it 'update boxbilling notifies clear cache' do
+      resource = chef_run.execute('update boxbilling')
+      expect(resource).to notify('execute[clear cache]').to(:run)
     end
   end
 end
