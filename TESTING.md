@@ -5,6 +5,7 @@ Testing
 
 * `vagrant`
 * `foodcritic`
+* `rubocop`
 * `berkshelf`
 * `should_not`
 * `chefspec`
