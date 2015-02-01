@@ -20,10 +20,12 @@
 
 require 'spec_helper'
 
-# make `Kernel#require` mockable
-class Chef::Recipe
-  def require(string)
-    Kernel.require(string)
+class Chef
+  # make `Kernel#require` mockable
+  class Recipe
+    def require(string)
+      Kernel.require(string)
+    end
   end
 end
 

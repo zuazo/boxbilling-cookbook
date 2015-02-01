@@ -30,7 +30,8 @@ include_recipe 'php'
 #==============================================================================
 
 if boxbilling_lt4?
-  ioncube_file = ::File.join(Chef::Config[:file_cache_path], 'ioncube_loaders.tar.gz')
+  ioncube_file = ::File.join(Chef::Config[:file_cache_path],
+                             'ioncube_loaders.tar.gz')
 
   remote_file 'download ioncube' do
     if node['kernel']['machine'] =~ /x86_64/
@@ -45,8 +46,11 @@ if boxbilling_lt4?
   execute 'install ioncube' do
     command <<-EOF
       cd "$(php -i | awk '$1 == "extension_dir" {print $NF}')" &&
-      tar xfz '#{ioncube_file}' --strip-components=1 --no-same-owner --wildcards --no-anchored '*.so' &&
-      echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | grep -o '[0-9][.][0-9][0-9]*' | head -1).so" > '#{node['php']['ext_conf_dir']}/20ioncube.ini'
+      tar xfz '#{ioncube_file}' --strip-components=1 --no-same-owner \
+        --wildcards --no-anchored '*.so' &&
+      echo "zend_extension = $(pwd)/ioncube_loader_lin_$(php -v | \
+        grep -o '[0-9][.][0-9][0-9]*' | head -1).so" > \
+        '#{node['php']['ext_conf_dir']}/20ioncube.ini'
       EOF
     creates ::File.join(node['php']['ext_conf_dir'], '20ioncube.ini')
   end

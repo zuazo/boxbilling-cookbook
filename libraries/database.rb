@@ -21,14 +21,14 @@
 #
 
 module BoxBilling
+  # Interact with BoxBilling database
   class Database
-
     ADMIN_SQL_WHERE = {
-      :role => 'admin',
-      :status => 'active'
+      role: 'admin',
+      status: 'active'
     } unless defined?(::BoxBilling::Database::ADMIN_SQL_WHERE)
 
-    def initialize(options={})
+    def initialize(options = {})
       @conn_string = options
       @conn_string[:adapter] = 'mysql'
       @conn_string[:logger] = Chef::Log
@@ -39,10 +39,10 @@ module BoxBilling
     end
 
     def generate_admin_api_token
-      # TODO UPDATE updated_at field ?
+      # TODO: UPDATE updated_at field ?
       api_token = generatepassword(32)
       connect do |db|
-        db[:admin].where(ADMIN_SQL_WHERE).limit(1).update(:api_token => api_token)
+        db[:admin].where(ADMIN_SQL_WHERE).limit(1).update(api_token: api_token)
       end
     end
 
@@ -60,16 +60,15 @@ module BoxBilling
       connect { |db| db.tables.empty? }
     end
 
-  protected
+    protected
 
-    def generatepassword(len=8)
+    def generatepassword(len = 8)
       # Based on secure_password method from openssl cookbook
-      pw = String.new
+      pw = ''
       while pw.length < len
         pw << ::OpenSSL::Random.random_bytes(1).gsub(/\W/, '')
       end
       pw[0, len]
     end
-
   end
 end

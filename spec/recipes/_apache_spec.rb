@@ -54,7 +54,7 @@ describe 'boxbilling::_apache' do
   context 'web_app boxbilling definition' do
     it 'creates apache2 site' do
       expect(chef_run)
-        .to create_template(/\/sites-available\/boxbilling\.conf$/)
+        .to create_template(%r{/sites-available/boxbilling\.conf$})
     end
   end
 

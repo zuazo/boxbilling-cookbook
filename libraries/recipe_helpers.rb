@@ -24,6 +24,7 @@ require 'uri'
 require 'net/http'
 
 module BoxBilling
+  # Helpers for BoxBilling cookbook.
   module RecipeHelpers
     def boxbilling_web_server
       node['boxbilling']['web_server']
@@ -65,7 +66,7 @@ module BoxBilling
     end
 
     def boxbilling_installed_version
-      node.run_state["boxbilling_installed_version_cache"] ||=
+      node.run_state['boxbilling_installed_version_cache'] ||=
         ::BoxBilling::Version.from_install_dir(node['boxbilling']['dir'])
     end
 
@@ -75,22 +76,21 @@ module BoxBilling
 
     def boxbilling_database_empty?
       db_password = encrypted_attribute_read(%w(boxbilling config db_password))
-      BoxBilling::Database.new({
-        :host     => node['boxbilling']['config']['db_host'],
-        :database => node['boxbilling']['config']['db_name'],
-        :user     => node['boxbilling']['config']['db_user'],
-        :password => db_password,
-      }).database_empty?
+      BoxBilling::Database.new(
+        host: node['boxbilling']['config']['db_host'],
+        database: node['boxbilling']['config']['db_name'],
+        user: node['boxbilling']['config']['db_user'],
+        password: db_password
+      ).database_empty?
     end
 
     def boxbilling_fresh_install?
-      not ::File.exist?(::File.join(node['boxbilling']['dir'], 'index.php'))
+      ! ::File.exist?(::File.join(node['boxbilling']['dir'], 'index.php'))
     end
 
     def boxbilling_update?
       return false unless boxbilling_installed_version
       boxbilling_version != boxbilling_installed_version
     end
-
   end
 end

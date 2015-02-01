@@ -60,7 +60,7 @@ describe 'boxbilling::_nginx' do
   end
 
   it 'creates nginx boxbilling site' do
-    expect(chef_run).to create_template(/\/sites-available\/boxbilling$/)
+    expect(chef_run).to create_template(%r{/sites-available/boxbilling$})
   end
 
   context 'nginx_site boxbilling definition' do

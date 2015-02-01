@@ -65,7 +65,7 @@ if node['boxbilling']['ssl']
     port: '443',
     ssl: true,
     ssl_key: cert.key_path,
-    ssl_cert: cert.chain_combined_path,
+    ssl_cert: cert.chain_combined_path
   )
 
   # Create virtualhost

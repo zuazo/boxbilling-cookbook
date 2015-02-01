@@ -32,12 +32,12 @@ def get_admin_api_token
     else
       node['boxbilling']['config']['db_password']
     end
-  db = BoxBilling::Database.new({
-    :host     => node['boxbilling']['config']['db_host'],
-    :database => node['boxbilling']['config']['db_name'],
-    :user     => node['boxbilling']['config']['db_user'],
-    :password => password,
-  })
+  db = BoxBilling::Database.new(
+    host: node['boxbilling']['config']['db_host'],
+    database: node['boxbilling']['config']['db_name'],
+    user: node['boxbilling']['config']['db_user'],
+    password: password
+  )
   db.get_admin_api_token || begin
     db.generate_admin_api_token
     db.get_admin_api_token
@@ -46,7 +46,7 @@ end
 
 # Remove unnecessary slashes
 def filter_path(path)
-  path.gsub(/(^\/*|\/*$)/, '').gsub(/\/+/, '/')
+  path.gsub(%r{(^/*|/*$)}, '').gsub(/\/+/, '/')
 end
 
 # Get the final action string name for a path (from symbol)
@@ -86,7 +86,7 @@ def path_with_action(path, action)
   return path if action.nil?
   path_ary = path.split('/')
   if (path_ary[-1] == 'params')
-    path_ary[0..-2].concat([ "#{action.to_s}_#{path_ary[-1]}" ]).join('/')
+    path_ary[0..-2].concat(["#{action}_#{path_ary[-1]}"]).join('/')
   else
     joiner = path_ary.count < 3 ? '/' : '_'
     path + joiner + get_action_for_path(path, action)
@@ -102,8 +102,8 @@ end
 
 # Get "primary keys" from data Hash
 def get_primary_keys_from_data(data)
-  data.select do |key, value|
-    %w{id code type product_id tld}.include?(key.to_s)
+  data.select do |key, _value|
+    %w(id code type product_id tld).include?(key.to_s)
   end
 end
 
@@ -112,12 +112,12 @@ end
 def data_eql?(old, new)
   case new.class.to_s
   when 'Hash'
-    return false unless old.kind_of?(Hash)
+    return false unless old.is_a?(Hash)
     new.inject(true) do |res, (key, value)|
       res && data_eql?(old[key.to_s], value)
     end
   when 'Array'
-    return false unless old.kind_of?(Array)
+    return false unless old.is_a?(Array)
     new.each.with_index.inject(true) do |res, (value, i)|
       res && data_eql?(old[i], value)
     end
@@ -131,12 +131,12 @@ def path_supports?(path, action)
   path = filter_path(path)
   action = action.to_sym
 
-  return false if path == 'admin/invoice/tax' and action == :get
-  return false if path == 'admin/invoice/tax' and action == :update
-  return false if path == 'guest/staff' and action == :get
-  return false if path == 'guest/staff' and action == :get_list
-  return false if path == 'guest/staff' and action == :update
-  return true
+  return false if path == 'admin/invoice/tax' && action == :get
+  return false if path == 'admin/invoice/tax' && action == :update
+  return false if path == 'guest/staff' && action == :get
+  return false if path == 'guest/staff' && action == :get_list
+  return false if path == 'guest/staff' && action == :update
+  true
 end
 
 def boxbilling_old_api
@@ -146,16 +146,16 @@ def boxbilling_old_api
   end
 end
 
-def boxbilling_api_request(action=nil, args={})
+def boxbilling_api_request(action = nil, args = {})
   opts = {
-    :path => path_with_action(new_resource.path, action),
-    :data => args[:data] || new_resource.data,
-    :api_token => nil,
-    :referer => node['boxbilling']['config']['url'],
-    :debug => new_resource.debug,
+    path: path_with_action(new_resource.path, action),
+    data: args[:data] || new_resource.data,
+    api_token: nil,
+    referer: node['boxbilling']['config']['url'],
+    debug: new_resource.debug
   }
 
-  opts[:api_token] = get_admin_api_token if opts[:path].match(/^\/?admin\//)
+  opts[:api_token] = get_admin_api_token if opts[:path].match(%r{^/?admin/})
 
   if node['boxbilling']['config']['sef_urls']
     opts[:endpoint] = '/api%{path}'
@@ -173,32 +173,32 @@ def boxbilling_api_request(action=nil, args={})
     end
   begin
     BoxBilling::API.request(opts)
-  rescue Exception => e
+  rescue StandardError => e
     raise e unless ignore_failure
-    Chef::Log.warn("Ignored exception: #{e.to_s}")
+    Chef::Log.warn("Ignored exception: #{e}")
     nil
   end
 end
 
-def boxbilling_api_request_read(args={})
+def boxbilling_api_request_read(args = {})
   path = filter_path(new_resource.path)
-  if path_supports?(new_resource.path, :get)
+  if path_supports?(path, :get)
     boxbilling_api_request(:get, args)
-  elsif path_supports?(new_resource.path, :get_list) # some objects do not support :get, we should use :get_list
+  # some objects do not support :get, we should use :get_list
+  elsif path_supports?(path, :get_list)
     data_pkeys = get_primary_keys_from_data(new_resource.data)
     page = 1
     begin
-      get_list = boxbilling_api_request(:get_list, {
-        :data => {
-          :page => page
+      get_list = boxbilling_api_request(
+        :get_list,
+        data: {
+          page: page
         }
-      })
+      )
       get_list['list'].each do |item|
-        if data_eql?(get_primary_keys_from_data(item), data_pkeys)
-          return item
-        end
+        return item if data_eql?(get_primary_keys_from_data(item), data_pkeys)
       end
-      page = page + 1
+      page += 1
     end while page <= get_list['pages']
     return nil
   else
@@ -213,16 +213,18 @@ action :request do
 end
 
 action :create do
-  read_data = boxbilling_api_request_read({
-    :ignore_failure => true,
-  })
+  read_data = boxbilling_api_request_read(
+    ignore_failure: true
+  )
 
   if read_data.nil?
     converge_by("Create #{new_resource}: #{new_resource.data}") do
       boxbilling_api_request(:create)
       # run an update after the :create, required by some paths,
       # some values are ignored/not_saved by the create action
-      boxbilling_api_request(:update) if path_supports?(new_resource.path, :update)
+      if path_supports?(new_resource.path, :update)
+        boxbilling_api_request(:update)
+      end
     end
   # data exists, update
   elsif !data_eql?(read_data, new_resource.data)
@@ -253,9 +255,9 @@ action :update do
 end
 
 action :delete do
-  read_data = boxbilling_api_request_read({
-    :ignore_failure => true,
-  })
+  read_data = boxbilling_api_request_read(
+    ignore_failure: true
+  )
 
   unless read_data.nil?
     converge_by("Delete #{new_resource}: #{new_resource.data}") do

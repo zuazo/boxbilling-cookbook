@@ -23,29 +23,29 @@
 require 'json'
 
 module BoxBilling
+  # Send requests to BoxBilling API
   module API
-    @@cookie = nil
+    @cookie = nil
 
     def self.request(args)
-
       # Read options from args
       opts = {
-        :path => '/',
-        :ssl => false,
-        :data => {},
-        :host => 'localhost',
-        :user => 'admin',
-        :api_token => nil,
-        :referer => nil,
-        :debug => false,
-        :endpoint => '/api%{path}'
+        path: '/',
+        ssl: false,
+        data: {},
+        host: 'localhost',
+        user: 'admin',
+        api_token: nil,
+        referer: nil,
+        debug: false,
+        endpoint: '/api%{path}'
       }.merge(args)
       opts[:proto] = opts[:ssl] ? 'https' : 'http' unless opts[:proto]
       opts[:port] = opts[:ssl] ? 443 : 80 unless opts[:port]
-      opts[:path] = "/#{opts[:path]}" unless opts[:path][0] === '/'
+      opts[:path] = "/#{opts[:path]}" unless opts[:path][0] == '/'
 
       # Create HTTP object
-      path = opts[:endpoint] % {:path => opts[:path]}
+      path = opts[:endpoint] % { path: opts[:path] }
       uri = URI.parse("#{opts[:proto]}://#{opts[:host]}:#{opts[:port]}#{path}")
       http = Net::HTTP.new(uri.host, uri.port)
       if opts[:ssl]
@@ -60,42 +60,42 @@ module BoxBilling
       req['Content-Type'] = 'application/json'
       req['Referer'] = opts[:referer] unless opts[:referer].nil?
       req['User-Agent'] = if defined?(Chef::HTTP::HTTPRequest)
-        Chef::HTTP::HTTPRequest.user_agent
-      else
-        Chef::REST::RESTRequest.user_agent
-      end
-      unless @@cookie.nil?
-        req['Cookie'] = @@cookie
-      end
+                            Chef::HTTP::HTTPRequest.user_agent
+                          else
+                            Chef::REST::RESTRequest.user_agent
+                          end
+      req['Cookie'] = @cookie unless @cookie.nil?
       req.basic_auth opts[:user], opts[:api_token] unless opts[:api_token].nil?
       req.body = opts[:data].to_json
 
       # Read response
       resp = http.request(req)
-      if resp['Set-Cookie'].kind_of?(String)
-        @@cookie = resp['set-cookie'].split(';')[0]
-        Chef::Log.debug("#{self.name}##{__method__.to_s} cookie: #{@@cookie}")
+      if resp['Set-Cookie'].is_a?(String)
+        @cookie = resp['set-cookie'].split(';')[0]
+        Chef::Log.debug("#{name}##{__method__} cookie: #{@cookie}")
       end
       if (resp.code.to_i >= 400)
-        error_msg = "#{self.name}##{__method__.to_s}: #{resp.code} #{resp.message}"
-        raise error_msg
+        error_msg = "#{name}##{__method__}: #{resp.code} #{resp.message}"
+        fail error_msg
       else
         resp_json = JSON.parse(resp.body)
         unless resp_json['error'].nil?
           error = resp_json['error']
-          if error.has_key?('message')
-            error_msg = "#{self.name}##{__method__.to_s}: #{error['message']}"
-            raise error_msg
+          if error.key?('message')
+            error_msg = "#{name}##{__method__}: #{error['message']}"
+            fail error_msg
           else
-            raise error_msg
+            fail error_msg
           end
         end
-        Chef::Log.info("#{self.name}##{__method__.to_s} #{opts[:path]} result: #{resp_json['result'].to_s}") if opts[:debug]
+        if opts[:debug]
+          Chef::Log.info("#{name}##{__method__} #{opts[:path]} result: "\
+            "#{resp_json['result']}")
+        end
         return resp_json['result']
       end
 
-      return nil
+      nil
     end
-
   end
 end

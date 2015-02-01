@@ -24,7 +24,7 @@ require 'uri'
 require 'net/http'
 
 module BoxBilling
-  # Get BoxBilling version number from URL
+  # Get BoxBilling version number from URL or directory
   module Version
     unless defined?(::BoxBilling::Version::VERSION_REGEX)
       VERSION_REGEX = /\b\d+\.\d+(\.\d+)?\b/

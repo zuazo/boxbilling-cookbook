@@ -20,10 +20,12 @@
 
 require 'spec_helper'
 
-# make `Kernel#require` mockable
-class Chef::Recipe
-  def require(string)
-    Kernel.require(string)
+class Chef
+  # make `Kernel#require` mockable
+  class Recipe
+    def require(string)
+      Kernel.require(string)
+    end
   end
 end
 
@@ -41,9 +43,9 @@ describe 'boxbilling::default' do
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_version)
       .and_return('4.0.0')
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_update?)
-        .and_return(false)
+      .and_return(false)
     allow_any_instance_of(Chef::Recipe).to receive(:boxbilling_fresh_install?)
-        .and_return(true)
+      .and_return(true)
     stub_command('/usr/sbin/apache2 -t').and_return(true)
 
     node.set['boxbilling']['config']['db_name'] = db_name
@@ -233,11 +235,16 @@ describe 'boxbilling::default' do
     end
 
     it 'does not set /bb-themes/huraga/assets directory writable' do
-      expect(chef_run).to_not create_directory(end_with('/bb-themes/huraga/assets'))
+      expect(chef_run).to_not create_directory(
+        end_with('/bb-themes/huraga/assets')
+      )
     end
 
-    it 'does not set /bb-themes/huraga/config/settings_data.json file writable' do
-      expect(chef_run).to_not touch_file(end_with('/bb-themes/huraga/config/settings_data.json'))
+    it 'does not set /bb-themes/huraga/config/settings_data.json file '\
+    'writable' do
+      expect(chef_run).to_not touch_file(
+        end_with('/bb-themes/huraga/config/settings_data.json')
+      )
     end
   end
 
@@ -260,7 +267,9 @@ describe 'boxbilling::default' do
     end
 
     it 'sets /bb-themes/huraga/config/settings_data.json file writable' do
-      expect(chef_run).to touch_file(end_with('/bb-themes/boxbilling/config/settings_data.json'))
+      expect(chef_run).to touch_file(
+          end_with('/bb-themes/boxbilling/config/settings_data.json')
+        )
         .with_owner('www-data')
         .with_group('www-data')
         .with_mode(00640)

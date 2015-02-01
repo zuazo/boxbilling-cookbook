@@ -62,14 +62,16 @@ end
 # Install MySQL
 #==============================================================================
 
-if %w{ localhost 127.0.0.1 }.include?(node['boxbilling']['config']['db_host'])
+if %w( localhost 127.0.0.1 ).include?(node['boxbilling']['config']['db_host'])
   include_recipe 'boxbilling::mysql'
   include_recipe 'database::mysql'
 
   mysql_connection_info = {
-    :host => 'localhost',
-    :username => 'root',
-    :password => encrypted_attribute_read(['boxbilling', 'mysql', 'server_root_password']),
+    host: 'localhost',
+    username: 'root',
+    password: encrypted_attribute_read(
+      %w( boxbilling mysql server_root_password )
+    )
   }
 
   mysql_database node['boxbilling']['config']['db_name'] do
@@ -127,7 +129,7 @@ end
 
 execute 'extract boxbilling' do
   command "unzip -q -o '#{local_file}' -d '#{node['boxbilling']['dir']}'"
-  only_if { recipe.boxbilling_update? or recipe.boxbilling_fresh_install? }
+  only_if { recipe.boxbilling_update? || recipe.boxbilling_fresh_install? }
   notifies :run, 'execute[update boxbilling]' if recipe.boxbilling_update?
 end
 
@@ -137,14 +139,14 @@ end
 
 themes =
   if boxbilling_lt4?
-    %w{ boxbilling }
+    %w( boxbilling )
   else
-    %w{ boxbilling huraga }
+    %w( boxbilling huraga )
   end
 
 # set writable directories
 (
-  %w{ cache log uploads }.map do |data_dir|
+  %w( cache log uploads ).map do |data_dir|
     ::File.join('bb-data', data_dir)
   end +
   themes.map do |theme_dir|
@@ -184,24 +186,25 @@ template 'bb-config.php' do
   group boxbilling_web_group
   mode 00640
   variables(
-    :timezone => node['boxbilling']['config']['timezone'],
-    :db_host => node['boxbilling']['config']['db_host'],
-    :db_name => node['boxbilling']['config']['db_name'],
-    :db_user => node['boxbilling']['config']['db_user'],
-    :db_password => db_password,
-    :url => node['boxbilling']['config']['url'],
-    :license => node['boxbilling']['config']['license'],
-    :locale => node['boxbilling']['config']['locale'],
-    :sef_urls => node['boxbilling']['config']['sef_urls'],
-    :debug => node['boxbilling']['config']['debug'],
-    :salt => salt,
-    :api => node['boxbilling']['api_config'] || {}
+    timezone: node['boxbilling']['config']['timezone'],
+    db_host: node['boxbilling']['config']['db_host'],
+    db_name: node['boxbilling']['config']['db_name'],
+    db_user: node['boxbilling']['config']['db_user'],
+    db_password: db_password,
+    url: node['boxbilling']['config']['url'],
+    license: node['boxbilling']['config']['license'],
+    locale: node['boxbilling']['config']['locale'],
+    sef_urls: node['boxbilling']['config']['sef_urls'],
+    debug: node['boxbilling']['config']['debug'],
+    salt: salt,
+    api: node['boxbilling']['api_config'] || {}
   )
 end
 
 # create api configuration file
 template 'api-config.php' do
-  path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api', 'api-config.php')
+  path ::File.join(node['boxbilling']['dir'], 'bb-modules', 'mod_api',
+                   'api-config.php')
   source 'api-config.php.erb'
   owner boxbilling_web_user
   group boxbilling_web_group
@@ -220,9 +223,9 @@ template 'boxbilling .htaccess' do
   group boxbilling_web_group
   mode 00640
   variables(
-    :domain => node['boxbilling']['server_name'].gsub(/^www\./, ''),
-    :sef_urls => node['boxbilling']['config']['sef_urls'],
-    :boxbilling_lt4 => recipe.boxbilling_lt4?
+    domain: node['boxbilling']['server_name'].gsub(/^www\./, ''),
+    sef_urls: node['boxbilling']['config']['sef_urls'],
+    boxbilling_lt4: recipe.boxbilling_lt4?
   )
   only_if { boxbilling_web_server == 'apache' }
 end
@@ -231,9 +234,9 @@ end
 mysql_database 'create database content' do
   database_name node['boxbilling']['config']['db_name']
   connection(
-    :host => node['boxbilling']['config']['db_host'],
-    :username => node['boxbilling']['config']['db_user'],
-    :password => db_password
+    host: node['boxbilling']['config']['db_host'],
+    username: node['boxbilling']['config']['db_user'],
+    password: db_password
   )
   sql do
     structure_sql =
@@ -241,7 +244,7 @@ mysql_database 'create database content' do
     content_sql =
         ::File.join(node['boxbilling']['dir'], 'install', 'content.sql')
     sql = ::File.open(structure_sql).read
-    ::File.exists?(content_sql) ? sql + ::File.open(content_sql).read : sql
+    ::File.exist?(content_sql) ? sql + ::File.open(content_sql).read : sql
   end
   action :query
   only_if { recipe.boxbilling_database_empty? }
@@ -253,8 +256,8 @@ end
 boxbilling_api 'create admin user' do
   path 'guest/staff'
   data(
-    :email => node['boxbilling']['admin']['email'],
-    :password => admin_pass,
+    email: node['boxbilling']['admin']['email'],
+    password: admin_pass
   )
   ignore_failure true
   action :nothing
