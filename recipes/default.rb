@@ -145,14 +145,14 @@ themes =
   end
 
 # set writable directories
-(
-  %w( cache log uploads ).map do |data_dir|
-    ::File.join('bb-data', data_dir)
-  end +
-  themes.map do |theme_dir|
-    ::File.join('bb-themes', theme_dir, 'assets')
-  end
-).each do |dir|
+writable_dirs = %w( cache log uploads ).map do |data_dir|
+  ::File.join('bb-data', data_dir)
+end
+writable_dirs += themes.map do |theme_dir|
+  ::File.join('bb-themes', theme_dir, 'assets')
+end
+
+writable_dirs.each do |dir|
   directory ::File.join(node['boxbilling']['dir'], dir) do
     recursive true
     owner boxbilling_web_user
@@ -163,9 +163,11 @@ themes =
 end
 
 # set writable files
-themes.map do |theme_dir|
+writable_files = themes.map do |theme_dir|
   ::File.join('bb-themes', theme_dir, 'config', 'settings_data.json')
-end.each do |dir|
+end
+
+writable_files.each do |dir|
   file ::File.join(node['boxbilling']['dir'], dir) do
     owner boxbilling_web_user
     group boxbilling_web_group

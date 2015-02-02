@@ -24,7 +24,7 @@ def whyrun_supported?
   true
 end
 
-def get_admin_api_token
+def admin_api_token
   password =
     if node['boxbilling']['encrypt_attributes']
       require 'chef-encrypted-attributes'
@@ -38,9 +38,9 @@ def get_admin_api_token
     user: node['boxbilling']['config']['db_user'],
     password: password
   )
-  db.get_admin_api_token || begin
+  db.admin_api_token || begin
     db.generate_admin_api_token
-    db.get_admin_api_token
+    db.admin_api_token
   end
 end
 
@@ -155,7 +155,7 @@ def boxbilling_api_request(action = nil, args = {})
     debug: new_resource.debug
   }
 
-  opts[:api_token] = get_admin_api_token if opts[:path].match(%r{^/?admin/})
+  opts[:api_token] = admin_api_token if opts[:path].match(%r{^/?admin/})
 
   if node['boxbilling']['config']['sef_urls']
     opts[:endpoint] = '/api%{path}'
@@ -188,7 +188,7 @@ def boxbilling_api_request_read(args = {})
   elsif path_supports?(path, :get_list)
     data_pkeys = get_primary_keys_from_data(new_resource.data)
     page = 1
-    begin
+    loop do
       get_list = boxbilling_api_request(
         :get_list,
         data: {
@@ -199,7 +199,8 @@ def boxbilling_api_request_read(args = {})
         return item if data_eql?(get_primary_keys_from_data(item), data_pkeys)
       end
       page += 1
-    end while page <= get_list['pages']
+      break unless page <= get_list['pages']
+    end
     return nil
   else
     return nil

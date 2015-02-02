@@ -46,7 +46,7 @@ module BoxBilling
       end
     end
 
-    def get_admin_api_token
+    def admin_api_token
       connect do |db|
         begin
           db[:admin].select(:api_token).where(ADMIN_SQL_WHERE).first[:api_token]
