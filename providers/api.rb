@@ -103,7 +103,7 @@ end
 # Get "primary keys" from data Hash
 def get_primary_keys_from_data(data)
   data.select do |key, _value|
-    %w(id code type product_id tld).include?(key.to_s)
+    %w(id code type product_id tld action_code).include?(key.to_s)
   end
 end
 
@@ -126,6 +126,14 @@ def data_eql?(old, new)
   end
 end
 
+# Compare the primary keys of 2 items.
+def same_item?(old, new)
+  old_keys = get_primary_keys_from_data(old)
+  new_keys = get_primary_keys_from_data(new)
+  return false unless new_keys.length
+  data_eql?(old_keys, new_keys)
+end
+
 # Check if the path supports an action
 def path_supports?(path, action)
   path = filter_path(path)
@@ -136,6 +144,7 @@ def path_supports?(path, action)
   return false if path == 'guest/staff' && action == :get
   return false if path == 'guest/staff' && action == :get_list
   return false if path == 'guest/staff' && action == :update
+  return false if path == 'admin/email/template' && action == :get
   true
 end
 
@@ -196,7 +205,7 @@ def boxbilling_api_request_read(args = {})
         }
       )
       get_list['list'].each do |item|
-        return item if data_eql?(get_primary_keys_from_data(item), data_pkeys)
+        return item if same_item?(item, new_resource.data)
       end
       page += 1
       break unless page <= get_list['pages']
@@ -229,14 +238,16 @@ action :create do
     end
   # data exists, update
   elsif !data_eql?(read_data, new_resource.data)
+    new_data =
+      get_primary_keys_from_data(read_data).merge(new_resource.data)
     if path_supports?(new_resource.path, :update)
       converge_by("Update #{new_resource}: #{new_resource.data}") do
-        boxbilling_api_request(:update)
+        boxbilling_api_request(:update, data: new_data)
       end
     # doesn't support update, use delete and then create
     else
       converge_by("Delete #{new_resource}: #{new_resource.data}") do
-        boxbilling_api_request(:delete)
+        boxbilling_api_request(:delete, data: read_data)
       end
       converge_by("Create #{new_resource}: #{new_resource.data}") do
         boxbilling_api_request(:create)
