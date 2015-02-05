@@ -195,7 +195,6 @@ def boxbilling_api_request_read(args = {})
     boxbilling_api_request(:get, args)
   # some objects do not support :get, we should use :get_list
   elsif path_supports?(path, :get_list)
-    data_pkeys = get_primary_keys_from_data(new_resource.data)
     page = 1
     loop do
       get_list = boxbilling_api_request(
