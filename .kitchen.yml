@@ -35,7 +35,7 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.12.1/BoxBilling.zip
+      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.14.2/BoxBilling.zip
 - name: nginx
   excludes:
   # not supported by php-fpm cookbook
@@ -44,5 +44,5 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.12.1/BoxBilling.zip
+      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.14.2/BoxBilling.zip
       web_server: nginx
