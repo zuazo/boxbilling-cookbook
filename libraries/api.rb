@@ -25,7 +25,19 @@ require 'json'
 module BoxBilling
   # Send requests to BoxBilling API
   module API
-    @cookie = nil
+    # rubocop:disable Style/ClassVars
+
+    @@cookie = nil
+
+    def self.cookie
+      @@cookie
+    end
+
+    def self.cookie=(arg)
+      @@cookie = arg
+    end
+
+    # rubocop:enable Style/ClassVars
 
     def self.request(args)
       # Read options from args
@@ -64,15 +76,15 @@ module BoxBilling
                           else
                             Chef::REST::RESTRequest.user_agent
                           end
-      req['Cookie'] = @cookie unless @cookie.nil?
+      req['Cookie'] = cookie unless cookie.nil?
       req.basic_auth opts[:user], opts[:api_token] unless opts[:api_token].nil?
       req.body = opts[:data].to_json
 
       # Read response
       resp = http.request(req)
       if resp['Set-Cookie'].is_a?(String)
-        @cookie = resp['set-cookie'].split(';')[0]
-        Chef::Log.debug("#{name}##{__method__} cookie: #{@cookie}")
+        cookie = resp['set-cookie'].split(';')[0]
+        Chef::Log.debug("#{name}##{__method__} cookie: #{cookie}")
       end
       if (resp.code.to_i >= 400)
         error_msg = "#{name}##{__method__}: #{resp.code} #{resp.message}"
