@@ -20,8 +20,6 @@
 # limitations under the License.
 #
 
-::Chef::Provider::BoxbillingApi.send(:include, ::BoxBilling::RecipeHelpers)
-
 def whyrun_supported?
   true
 end
@@ -208,12 +206,14 @@ def boxbilling_api_request_read(args = {})
 end
 
 action :request do
+  self.class.send(:include, ::BoxBilling::RecipeHelpers)
   converge_by("Request #{new_resource}: #{new_resource.data}") do
     boxbilling_api_request
   end
 end
 
 action :create do
+  self.class.send(:include, ::BoxBilling::RecipeHelpers)
   read_data = boxbilling_api_request_read(ignore_failure: true)
 
   if read_data.nil?
@@ -246,6 +246,8 @@ action :create do
 end
 
 action :update do
+  self.class.send(:include, ::BoxBilling::RecipeHelpers)
+
   read_data = boxbilling_api_request_read
 
   unless data_eql?(read_data, new_resource.data)
@@ -256,6 +258,7 @@ action :update do
 end
 
 action :delete do
+  self.class.send(:include, ::BoxBilling::RecipeHelpers)
   read_data = boxbilling_api_request_read(ignore_failure: true)
 
   unless read_data.nil?
