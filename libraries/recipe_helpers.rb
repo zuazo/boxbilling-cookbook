@@ -44,11 +44,13 @@ module BoxBilling
       node[boxbilling_web_server]['group']
     end
 
-    def boxbilling_upload_cookbook_file(file)
-      path = ::File.join(node['boxbilling']['dir'], 'bb-uploads', file)
+    def boxbilling_upload_cookbook_file_path(file)
+      ::File.join(node['boxbilling']['dir'], 'bb-uploads', file)
+    end
 
+    def boxbilling_upload_cookbook_file(file)
       # Upload product images
-      cookbook_file path do
+      cookbook_file boxbilling_upload_cookbook_file_path(file) do
         path path
         owner boxbilling_web_user
         group boxbilling_web_group
@@ -74,13 +76,16 @@ module BoxBilling
       boxbilling_version.to_i < 4
     end
 
+    def boxbilling_database_password
+      encrypted_attribute_read(%w(boxbilling config db_password))
+    end
+
     def boxbilling_database_empty?
-      db_password = encrypted_attribute_read(%w(boxbilling config db_password))
       BoxBilling::Database.new(
         host: node['boxbilling']['config']['db_host'],
         database: node['boxbilling']['config']['db_name'],
         user: node['boxbilling']['config']['db_user'],
-        password: db_password
+        password: boxbilling_database_password
       ).database_empty?
     end
 

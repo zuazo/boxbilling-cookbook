@@ -40,16 +40,20 @@ module BoxBilling
 
     def generate_admin_api_token
       # TODO: UPDATE updated_at field ?
-      api_token = generatepassword(32)
-      connect do |db|
-        db[:admin].where(ADMIN_SQL_WHERE).limit(1).update(api_token: api_token)
+      generatepassword(32).tap do |api_token|
+        connect do |db|
+          db[:admin]
+            .where(ADMIN_SQL_WHERE).limit(1).update(api_token: api_token)
+        end
       end
     end
 
     def admin_api_token
       connect do |db|
         begin
-          db[:admin].select(:api_token).where(ADMIN_SQL_WHERE).first[:api_token]
+          result = db[:admin].select(:api_token).where(ADMIN_SQL_WHERE).first
+          return nil if result.nil?
+          result[:api_token]
         rescue Sequel::DatabaseError
           nil
         end

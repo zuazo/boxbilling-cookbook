@@ -24,24 +24,27 @@ def whyrun_supported?
   true
 end
 
-def admin_api_token
-  password =
-    if node['boxbilling']['encrypt_attributes']
-      require 'chef-encrypted-attributes'
-      Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
-    else
-      node['boxbilling']['config']['db_password']
-    end
-  db = BoxBilling::Database.new(
+def admin_password
+  if node['boxbilling']['encrypt_attributes']
+    require 'chef-encrypted-attributes'
+    Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
+  else
+    node['boxbilling']['config']['db_password']
+  end
+end
+
+def boxbilling_database
+  BoxBilling::Database.new(
     host: node['boxbilling']['config']['db_host'],
     database: node['boxbilling']['config']['db_name'],
     user: node['boxbilling']['config']['db_user'],
-    password: password
+    password: admin_password
   )
-  db.admin_api_token || begin
-    db.generate_admin_api_token
-    db.admin_api_token
-  end
+end
+
+def admin_api_token
+  db = boxbilling_database
+  db.admin_api_token || db.generate_admin_api_token
 end
 
 # Remove unnecessary slashes
@@ -57,19 +60,9 @@ end
 def get_action_for_path(path, action)
   case action
   when :create
-    case path
-    when 'admin/product', 'admin/invoice'
-      :prepare
-    else
-      action
-    end
+    %w(admin/product admin/invoice).include?(path) ? :prepare : action
   when :update
-    case path
-    when 'admin/extension/config'
-      :save
-    else
-      action
-    end
+    %w(admin/extension/config).include?(path) ? :save : action
   else
     action
   end.to_s
@@ -107,20 +100,26 @@ def get_primary_keys_from_data(data)
   end
 end
 
+def data_hash_eql?(old, new)
+  return false unless old.is_a?(Hash)
+  new.inject(true) do |res, (key, value)|
+    res && data_eql?(old[key.to_s], value)
+  end
+end
+
+def data_array_eql?(old, new)
+  return false unless old.is_a?(Array)
+  new.each.with_index.inject(true) do |res, (value, i)|
+    res && data_eql?(old[i], value)
+  end
+end
+
 # Compares each new value with the old one. Old values that do not
 # exists in new are ignored.
 def data_eql?(old, new)
   case new.class.to_s
-  when 'Hash'
-    return false unless old.is_a?(Hash)
-    new.inject(true) do |res, (key, value)|
-      res && data_eql?(old[key.to_s], value)
-    end
-  when 'Array'
-    return false unless old.is_a?(Array)
-    new.each.with_index.inject(true) do |res, (value, i)|
-      res && data_eql?(old[i], value)
-    end
+  when 'Hash' then data_hash_eql?(old, new)
+  when 'Array' then data_array_eql?(old, new)
   else
     normalize_data_value(old) == normalize_data_value(new)
   end
@@ -134,58 +133,84 @@ def same_item?(old, new)
   data_eql?(old_keys, new_keys)
 end
 
+PATH_MISSING_ACTIONS = {
+  'admin/invoice/tax' => %w(get update),
+  'guest/staff' => %w(get get_list update),
+  'admin/email/template' => %w(get)
+}
+
 # Check if the path supports an action
 def path_supports?(path, action)
   path = filter_path(path)
-  action = action.to_sym
+  action = action.to_s
 
-  return false if path == 'admin/invoice/tax' && action == :get
-  return false if path == 'admin/invoice/tax' && action == :update
-  return false if path == 'guest/staff' && action == :get
-  return false if path == 'guest/staff' && action == :get_list
-  return false if path == 'guest/staff' && action == :update
-  return false if path == 'admin/email/template' && action == :get
-  true
+  !PATH_MISSING_ACTIONS.key?(path) ||
+    !PATH_MISSING_ACTIONS[path].include?(action)
 end
 
-def boxbilling_old_api
+def boxbilling_old_api?
   @old_api ||= begin
     self.class.send(:include, ::BoxBilling::RecipeHelpers)
     boxbilling_lt4?
   end
 end
 
-def boxbilling_api_request(action = nil, args = {})
-  opts = {
+def boxbilling_api_request_default_options(action, args)
+  {
     path: path_with_action(new_resource.path, action),
     data: args[:data] || new_resource.data,
     api_token: nil,
     referer: node['boxbilling']['config']['url'],
+    ignore_failure: args[:ignore_failure],
     debug: new_resource.debug
   }
+end
 
-  opts[:api_token] = admin_api_token if opts[:path].match(%r{^/?admin/})
-
+def boxbilling_api_endpooint
   if node['boxbilling']['config']['sef_urls']
-    opts[:endpoint] = '/api%{path}'
-  elsif boxbilling_old_api
-    opts[:endpoint] = '/index.php/api%{path}'
+    '/api%{path}'
+  elsif boxbilling_old_api?
+    '/index.php/api%{path}'
   else
-    opts[:endpoint] = '/index.php?_url=/api%{path}'
+    '/index.php?_url=/api%{path}'
   end
+end
 
-  ignore_failure =
-    if args[:ignore_failure].nil?
-      new_resource.ignore_failure
-    else
-      args[:ignore_failure]
-    end
+def boxbilling_api_request_options(action, args)
+  boxbilling_api_request_default_options(action, args).tap do |opts|
+    opts[:api_token] = admin_api_token if opts[:path].match(%r{^/?admin/})
+    opts[:endpoint] = boxbilling_api_endpooint
+  end
+end
+
+def ignore_failure?(opts)
+  if opts[:ignore_failure].nil?
+    new_resource.ignore_failure
+  else
+    opts[:ignore_failure]
+  end
+end
+
+def boxbilling_api_request(action = nil, args = {})
+  opts = boxbilling_api_request_options(action, args)
   begin
     BoxBilling::API.request(opts)
   rescue StandardError => e
-    raise e unless ignore_failure
+    raise e unless ignore_failure?(opts)
     Chef::Log.warn("Ignored exception: #{e}")
     nil
+  end
+end
+
+def boxbilling_api_request_read_list(_args)
+  page = 1
+  loop do
+    get_list = boxbilling_api_request(:get_list, data: { page: page })
+    get_list['list'].each do |item|
+      return item if same_item?(item, new_resource.data)
+    end
+    page += 1
+    break unless page <= get_list['pages']
   end
 end
 
@@ -195,21 +220,7 @@ def boxbilling_api_request_read(args = {})
     boxbilling_api_request(:get, args)
   # some objects do not support :get, we should use :get_list
   elsif path_supports?(path, :get_list)
-    page = 1
-    loop do
-      get_list = boxbilling_api_request(
-        :get_list,
-        data: {
-          page: page
-        }
-      )
-      get_list['list'].each do |item|
-        return item if same_item?(item, new_resource.data)
-      end
-      page += 1
-      break unless page <= get_list['pages']
-    end
-    return nil
+    boxbilling_api_request_read_list(args)
   else
     return nil
   end
@@ -222,9 +233,7 @@ action :request do
 end
 
 action :create do
-  read_data = boxbilling_api_request_read(
-    ignore_failure: true
-  )
+  read_data = boxbilling_api_request_read(ignore_failure: true)
 
   if read_data.nil?
     converge_by("Create #{new_resource}: #{new_resource.data}") do
@@ -266,9 +275,7 @@ action :update do
 end
 
 action :delete do
-  read_data = boxbilling_api_request_read(
-    ignore_failure: true
-  )
+  read_data = boxbilling_api_request_read(ignore_failure: true)
 
   unless read_data.nil?
     converge_by("Delete #{new_resource}: #{new_resource.data}") do
