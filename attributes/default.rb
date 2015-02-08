@@ -69,7 +69,7 @@ default['boxbilling']['config']['url'] =
 default['boxbilling']['config']['license'] = nil
 default['boxbilling']['config']['locale'] = 'en_US'
 default['boxbilling']['config']['sef_urls'] = false
-default['boxbilling']['config']['debug'] = false
+default['boxbilling']['config']['debug'] = Chef::Config[:log_level] == :debug
 
 default['boxbilling']['api_config']['require_referer_header'] = true
 default['boxbilling']['api_config']['allowed_ips'] = []

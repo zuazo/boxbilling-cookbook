@@ -154,7 +154,7 @@ Attributes
   <tr>
     <td><code>node['boxbilling']['config']['debug']</code></td>
     <td>Whether to enable BoxBilling debug mode.</td>
-    <td><code>false</code></td>
+    <td><em>calculated</em></td>
   </tr>
   <tr>
     <td><code>node['boxbilling']['api_config']['require_referer_header']</code></td>
@@ -282,7 +282,7 @@ This resource uses the [BoxBilling v2 Admin API](http://www.boxbilling.com/docs/
   <tr>
     <td>debug</td>
     <td>Whether to enable debug mode.</td>
-    <td><code>false</code></td>
+    <td><em>calculated</em></td>
   </tr>
   <tr>
     <td>ignore_failure</td>
