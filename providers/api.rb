@@ -20,26 +20,10 @@
 # limitations under the License.
 #
 
+::Chef::Provider::BoxbillingApi.send(:include, ::BoxBilling::RecipeHelpers)
+
 def whyrun_supported?
   true
-end
-
-def admin_password
-  if node['boxbilling']['encrypt_attributes']
-    require 'chef-encrypted-attributes'
-    Chef::EncryptedAttribute.load(node['boxbilling']['config']['db_password'])
-  else
-    node['boxbilling']['config']['db_password']
-  end
-end
-
-def boxbilling_database
-  BoxBilling::Database.new(
-    host: node['boxbilling']['config']['db_host'],
-    database: node['boxbilling']['config']['db_name'],
-    user: node['boxbilling']['config']['db_user'],
-    password: admin_password
-  )
 end
 
 def admin_api_token
@@ -149,10 +133,7 @@ def path_supports?(path, action)
 end
 
 def boxbilling_old_api?
-  @old_api ||= begin
-    self.class.send(:include, ::BoxBilling::RecipeHelpers)
-    boxbilling_lt4?
-  end
+  @old_api ||= boxbilling_lt4?
 end
 
 def boxbilling_api_request_default_options(action, args)

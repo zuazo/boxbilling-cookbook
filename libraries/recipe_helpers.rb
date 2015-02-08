@@ -26,6 +26,8 @@ require 'net/http'
 module BoxBilling
   # Helpers for BoxBilling cookbook.
   module RecipeHelpers
+    include Chef::EncryptedAttributesHelpers
+
     def boxbilling_web_server
       node['boxbilling']['web_server']
     end
@@ -76,17 +78,21 @@ module BoxBilling
       boxbilling_version.to_i < 4
     end
 
-    def boxbilling_database_password
-      encrypted_attribute_read(%w(boxbilling config db_password))
-    end
-
-    def boxbilling_database_empty?
+    def boxbilling_database
       BoxBilling::Database.new(
         host: node['boxbilling']['config']['db_host'],
         database: node['boxbilling']['config']['db_name'],
         user: node['boxbilling']['config']['db_user'],
         password: boxbilling_database_password
-      ).database_empty?
+      )
+    end
+
+    def boxbilling_database_password
+      encrypted_attribute_read(%w(boxbilling config db_password))
+    end
+
+    def boxbilling_database_empty?
+      boxbilling_database.database_empty?
     end
 
     def boxbilling_fresh_install?
