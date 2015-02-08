@@ -267,9 +267,9 @@ describe 'boxbilling::default' do
     end
 
     it 'sets /bb-themes/huraga/config/settings_data.json file writable' do
-      expect(chef_run).to touch_file(
-          end_with('/bb-themes/boxbilling/config/settings_data.json')
-        )
+      settings_json_sufix = '/bb-themes/boxbilling/config/settings_data.json'
+      expect(chef_run)
+        .to touch_file(end_with(settings_json_sufix))
         .with_owner('www-data')
         .with_group('www-data')
         .with_mode(00640)

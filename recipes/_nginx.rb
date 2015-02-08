@@ -42,7 +42,8 @@ template_variables = {
 }
 
 # Create virtualhost
-template File.join(node['nginx']['dir'], 'sites-available', 'boxbilling') do
+vhost_file = File.join(node['nginx']['dir'], 'sites-available', 'boxbilling')
+template vhost_file do
   source 'nginx_vhost.erb'
   mode 00644
   owner 'root'
@@ -69,9 +70,9 @@ if node['boxbilling']['ssl']
   )
 
   # Create virtualhost
-  template File.join(
-             node['nginx']['dir'], 'sites-available', 'boxbilling-ssl'
-           ) do
+  ssl_vhost_file =
+    File.join(node['nginx']['dir'], 'sites-available', 'boxbilling-ssl')
+  template ssl_vhost_file do
     source 'nginx_vhost.erb'
     mode 00644
     owner 'root'
