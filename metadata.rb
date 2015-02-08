@@ -27,7 +27,7 @@ description <<-EOS
 Installs and configures BoxBilling, invoice and client management software
 EOS
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '0.5.0'
+version '0.6.0' # WiP
 
 supports 'amazon'
 supports 'centos', '>= 6.0'
