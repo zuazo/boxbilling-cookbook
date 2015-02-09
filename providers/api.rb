@@ -218,11 +218,12 @@ action :create do
 
   if read_data.nil?
     converge_by("Create #{new_resource}: #{new_resource.data}") do
-      boxbilling_api_request(:create)
+      id = boxbilling_api_request(:create)
       # run an update after the :create, required by some paths,
       # some values are ignored/not_saved by the create action
       if path_supports?(new_resource.path, :update)
-        boxbilling_api_request(:update)
+        update_data = new_resource.data.merge(id: id)
+        boxbilling_api_request(:update, data: update_data)
       end
     end
   # data exists, update
