@@ -181,10 +181,11 @@ def boxbilling_api_request(action = nil, args = {})
   end
 end
 
-def boxbilling_api_request_read_list(_args)
+def boxbilling_api_request_read_list(args = {})
   page = 1
   loop do
-    get_list = boxbilling_api_request(:get_list, data: { page: page })
+    request_args = args.merge(data: { page: page })
+    get_list = boxbilling_api_request(:get_list, request_args)
     get_list['list'].each do |item|
       return item if same_item?(item, new_resource.data)
     end
