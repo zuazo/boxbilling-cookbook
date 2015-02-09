@@ -145,7 +145,7 @@ def boxbilling_api_request_default_options(action, args)
   }
 end
 
-def boxbilling_api_endpooint
+def boxbilling_api_endpoint
   if node['boxbilling']['config']['sef_urls']
     '/api%{path}'
   elsif boxbilling_old_api?
@@ -158,7 +158,7 @@ end
 def boxbilling_api_request_options(action, args)
   boxbilling_api_request_default_options(action, args).tap do |opts|
     opts[:api_token] = admin_api_token if opts[:path].match(%r{^/?admin/})
-    opts[:endpoint] = boxbilling_api_endpooint
+    opts[:endpoint] = boxbilling_api_endpoint
   end
 end
 
