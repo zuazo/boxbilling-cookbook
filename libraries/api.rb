@@ -135,15 +135,15 @@ module BoxBilling
     end
 
     def self.parse_json_response(response)
-      resp_json = JSON.parse(response.body)
-      unless resp_json['error'].nil?
-        error = resp_json['error']
-        if error.key?('message')
-          error_msg = "#{name}##{__method__}: #{error['message']}"
+      resp_json = JSON.parse(response.body, symbolize_names: true)
+      unless resp_json[:error].nil?
+        error = resp_json[:error]
+        if error.key?(:message)
+          error_msg = "#{name}##{__method__}: #{error[:message]}"
         end
         fail error_msg
       end
-      resp_json['result']
+      resp_json[:result]
     end
 
     def self.parse_response(response)

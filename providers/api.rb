@@ -24,6 +24,43 @@ def whyrun_supported?
   true
 end
 
+PATH_SPECIAL_IDS = {
+  'admin/servicedomain/tld' => :tld,
+  'admin/forum/profile' => :client_id,
+  'admin/currency' => :code,
+  'admin/extension/config' => :ext,
+  'admin/queue' => :queue,
+  'admin/theme' => :code,
+  'guest/invoice' => :hash,
+  'guest/support/ticket' => :hash
+}
+
+PATH_UNIQUE_KEYS = {
+  'admin/staff' => :email,
+  'admin/client' => :email,
+  'admin/email/template' => :action_code
+}
+
+PATH_MISSING_ACTIONS = {
+  'admin/extension/config' => %w(create delete),
+  'admin/invoice/item' => %w(get create update),
+  'admin/invoice/tax' => %w(get update),
+  'admin/notification' => %w(update),
+  'admin/order/status_history' => %w(get update),
+  'admin/profile' => %w(create delete),
+  'admin/queue/message' => %w(create update),
+  'admin/system/params' => %w(get_list create delete),
+  'guest/staff' => %w(get get_list update)
+}
+
+PATH_ALIAS_ACTIONS = {
+  'admin/extension/config' => { update: :save },
+  'admin/invoice' => { create: :prepare },
+  'admin/notification' => { create: :add },
+  'admin/product' => { create: :prepare },
+  'admin/queue/message' => { create: :add }
+}
+
 def admin_api_token
   db = boxbilling_database
   db.admin_api_token || db.generate_admin_api_token
@@ -40,14 +77,8 @@ end
 #   (admin/currency, :create) -> create
 #   (admin/product,  :create) -> prepare
 def get_action_for_path(path, action)
-  case action
-  when :create
-    %w(admin/product admin/invoice).include?(path) ? :prepare : action
-  when :update
-    %w(admin/extension/config).include?(path) ? :save : action
-  else
-    action
-  end.to_s
+  path = filter_path(path)
+  PATH_ALIAS_ACTIONS.fetch(path, {}).fetch(action, action).to_s
 end
 
 # Generate the full URL path, including the action at the end
@@ -75,17 +106,31 @@ def normalize_data_value(v)
   v.gsub(/^([0-9]+)[.]0+$/, '\1') # remove 0 decimals
 end
 
+def get_primary_key_field_from_path(path)
+  path = filter_path(path)
+  PATH_SPECIAL_IDS.fetch(path, :id)
+end
+
+def get_unique_key_field_from_path(path)
+  path = filter_path(path)
+  PATH_UNIQUE_KEYS.fetch(path, nil)
+end
+
 # Get "primary keys" from data Hash
 def get_primary_keys_from_data(data)
+  id_fields = [
+    get_primary_key_field_from_path(new_resource.path),
+    get_unique_key_field_from_path(new_resource.path)
+  ].compact
   data.select do |key, _value|
-    %w(id code type product_id tld action_code).include?(key.to_s)
+    id_fields.include?(key)
   end
 end
 
 def data_hash_eql?(old, new)
   return false unless old.is_a?(Hash)
   new.inject(true) do |res, (key, value)|
-    res && data_eql?(old[key.to_s], value)
+    res && data_eql?(old[key], value)
   end
 end
 
@@ -114,12 +159,6 @@ def same_item?(old, new)
   return false unless new_keys.length
   data_eql?(old_keys, new_keys)
 end
-
-PATH_MISSING_ACTIONS = {
-  'admin/invoice/tax' => %w(get update),
-  'guest/staff' => %w(get get_list update),
-  'admin/email/template' => %w(get)
-}
 
 # Check if the path supports an action
 def path_supports?(path, action)
@@ -186,17 +225,18 @@ def boxbilling_api_request_read_list(args = {})
   loop do
     request_args = args.merge(data: { page: page })
     get_list = boxbilling_api_request(:get_list, request_args)
-    get_list['list'].each do |item|
+    get_list[:list].each do |item|
       return item if same_item?(item, new_resource.data)
     end
     page += 1
-    break unless page <= get_list['pages']
+    break unless page <= get_list[:pages]
   end
 end
 
 def boxbilling_api_request_read(args = {})
   path = filter_path(new_resource.path)
-  if path_supports?(path, :get)
+  id_field = get_primary_key_field_from_path(new_resource.path)
+  if new_resource.data.key?(id_field) && path_supports?(path, :get)
     boxbilling_api_request(:get, args)
   # some objects do not support :get, we should use :get_list
   elsif path_supports?(path, :get_list)
@@ -223,7 +263,8 @@ action :create do
       # run an update after the :create, required by some paths,
       # some values are ignored/not_saved by the create action
       if path_supports?(new_resource.path, :update)
-        update_data = new_resource.data.merge(id: id)
+        id_field = get_primary_key_field_from_path(new_resource.path)
+        update_data = new_resource.data.merge(id_field => id)
         boxbilling_api_request(:update, data: update_data)
       end
     end
