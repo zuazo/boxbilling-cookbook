@@ -38,7 +38,14 @@ PATH_SPECIAL_IDS = {
 PATH_UNIQUE_KEYS = {
   'admin/staff' => :email,
   'admin/client' => :email,
-  'admin/email/template' => :action_code
+  'admin/email/template' => :action_code,
+  'admin/forum' => :slug,
+  'admin/forum/topic' => :slug,
+  'admin/kb/article' => :slug,
+  'admin/kb/category' => :slug,
+  'admin/news' => :slug,
+  'admin/product' => :slug,
+  'admin/product/addon' => :slug
 }
 
 PATH_MISSING_ACTIONS = {
@@ -69,6 +76,16 @@ end
 # Remove unnecessary slashes
 def filter_path(path)
   path.gsub(%r{(^/*|/*$)}, '').gsub(/\/+/, '/')
+end
+
+def slugify(string)
+  string
+    .strip
+    .downcase
+    .gsub(/[^a-z0-9-]/, '-')
+    .gsub(/-+/, '-')
+    .gsub(/^-+/, '')
+    .gsub(/-+$/, '')
 end
 
 # Get the final action string name for a path (from symbol)
@@ -118,10 +135,12 @@ end
 
 # Get "primary keys" from data Hash
 def get_primary_keys_from_data(data)
+  data = data.dup
   id_fields = [
     get_primary_key_field_from_path(new_resource.path),
     get_unique_key_field_from_path(new_resource.path)
   ].compact
+  data[:slug] ||= slugify(data[:title]) if id_fields.include?(:slug)
   data.select do |key, _value|
     id_fields.include?(key)
   end
