@@ -156,7 +156,7 @@ end
 def same_item?(old, new)
   old_keys = get_primary_keys_from_data(old)
   new_keys = get_primary_keys_from_data(new)
-  return false unless new_keys.length
+  return false if new_keys.empty?
   data_eql?(old_keys, new_keys)
 end
 
