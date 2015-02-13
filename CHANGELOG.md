@@ -3,6 +3,16 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.6.0 (2015-02-13)
+
+* `boxbilling_api`:
+ * Use returned id when updating after a create.
+ * Fix method name typo.
+ * Use passed args when reading list.
+ * Improved handling of borderline cases.
+ * Fix condition on same_item?.
+ * Handle paths that have slug field.
+
 ## v0.5.0 (2015-02-08)
 
 * Update boxbilling when `'download_url'` points to a new version.
