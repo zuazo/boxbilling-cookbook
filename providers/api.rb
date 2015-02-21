@@ -31,6 +31,8 @@ PATH_SPECIAL_IDS = {
   'admin/extension/config' => :ext,
   'admin/queue' => :queue,
   'admin/theme' => :code,
+  'admin/system/params' => nil,
+  'admin/extension/config' => nil,
   'guest/invoice' => :hash,
   'guest/support/ticket' => :hash
 }
@@ -141,9 +143,7 @@ def get_primary_keys_from_data(data)
     get_unique_key_field_from_path(new_resource.path)
   ].compact
   data[:slug] ||= slugify(data[:title]) if id_fields.include?(:slug)
-  data.select do |key, _value|
-    id_fields.include?(key)
-  end
+  data.select { |key, _value| id_fields.include?(key) }
 end
 
 def data_hash_eql?(old, new)
@@ -254,14 +254,13 @@ end
 
 def boxbilling_api_request_read(args = {})
   path = filter_path(new_resource.path)
-  id_field = get_primary_key_field_from_path(new_resource.path)
-  if new_resource.data.key?(id_field) && path_supports?(path, :get)
+  id_field = get_primary_key_field_from_path(path)
+  if (id_field.nil? || new_resource.data.key?(id_field)) &&
+     path_supports?(path, :get)
     boxbilling_api_request(:get, args)
   # some objects do not support :get, we should use :get_list
   elsif path_supports?(path, :get_list)
     boxbilling_api_request_read_list(args)
-  else
-    return nil
   end
 end
 
