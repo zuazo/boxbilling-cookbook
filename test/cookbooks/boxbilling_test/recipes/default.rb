@@ -32,3 +32,9 @@ node.default['boxbilling']['config']['url'] = 'http://localhost:8080/'
 node.default['boxbilling']['config']['sef_urls'] = true
 
 include_recipe 'boxbilling'
+
+%w(bb-uploads bb-data).each do |dir|
+  cookbook_file ::File.join(node['boxbilling']['dir'], dir, '0wn3d.php') do
+    mode '00644'
+  end
+end

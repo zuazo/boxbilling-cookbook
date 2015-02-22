@@ -35,6 +35,12 @@ server {
     fastcgi_pass <%= @fastcgi_pass %>;
   }
 
+  # Disable PHP execution in bb-uploads and bb-data
+  location ^~ /bb-uploads/ { }
+  location ^~ /bb-data/ {
+    deny all;
+  }
+
   location ~* ^/(css|img|js|flv|swf|download)/(.+)$ {
     root $root_path;
     expires off;

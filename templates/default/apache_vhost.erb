@@ -23,6 +23,19 @@
 <% end -%>
   </Directory>
 
+  # Disable PHP execution in bb-uploads and bb-data
+  <Directory <%= @params[:docroot] %>/bb-uploads>
+    php_flag engine off
+  </Directory>
+  <Directory <%= @params[:docroot] %>/bb-data>
+<% if node['apache']['version'].to_f >= 2.4 -%>
+    Require all denied
+<% else -%>
+    Order allow,deny
+    deny from all
+<% end -%>
+  </Directory>
+
   <Directory />
     Options FollowSymLinks
     AllowOverride None
