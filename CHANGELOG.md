@@ -3,6 +3,11 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.7.0 (2015-02-23)
+
+* Fix `boxbilling_api[admin/system/params]` notifications.
+* Disable PHP inside *bb-uploads* and *bb-data* directories.
+
 ## v0.6.0 (2015-02-13)
 
 * `boxbilling_api`:
