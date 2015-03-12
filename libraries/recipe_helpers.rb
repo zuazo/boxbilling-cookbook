@@ -47,7 +47,7 @@ module BoxBilling
     end
 
     def boxbilling_upload_cookbook_file_path(file)
-      ::File.join(node['boxbilling']['dir'], 'bb-uploads', file)
+      ::File.join(node['boxbilling']['dir'], file)
     end
 
     def boxbilling_upload_cookbook_file(file)
@@ -59,7 +59,7 @@ module BoxBilling
         mode '00750'
       end
 
-      "#{node['boxbilling']['config']['url']}/bb-uploads/#{file}"
+      "#{node['boxbilling']['config']['url']}/#{file}"
     end
 
     def boxbilling_version
