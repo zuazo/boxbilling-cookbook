@@ -3,6 +3,10 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.8.0 (2015-03-13)
+
+* `RecipeHelpers#boxbilling_upload_cookbook_file`: Upload files to the root directory instead of *bb-uploads* (disallowed in robots.txt).
+
 ## v0.7.0 (2015-02-23)
 
 * Fix `boxbilling_api[admin/system/params]` notifications.
