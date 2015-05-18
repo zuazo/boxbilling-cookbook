@@ -1,3 +1,9 @@
+<%
+  def nginx_version_satisfies?(req)
+    version = Gem::Version.new(node['nginx']['version'])
+    Gem::Requirement.new(req).satisfied_by?(version)
+  end
+-%>
 server {
   listen <%= @port ? @port : '80' %>;
   <% if @ssl -%>
@@ -16,6 +22,9 @@ server {
   root $root_path;
   try_files $uri $uri/ @rewrite;
   sendfile off;
+<% @headers.each do |header, value| -%>
+  add_header '<%= header %>' '<%= value %>'<% nginx_version_satisfies?('>= 1.7.5') ? ' always' : '' %>;
+<% end -%>
 
   location @rewrite {
      rewrite ^/(.*)$ /index.php?_url=/$1;

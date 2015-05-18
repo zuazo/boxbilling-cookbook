@@ -30,6 +30,7 @@ node.default['boxbilling']['config']['db_password'] = 'database_pass'
 node.default['boxbilling']['config']['license'] = 'dummy_license'
 node.default['boxbilling']['config']['url'] = 'http://localhost:8080/'
 node.default['boxbilling']['config']['sef_urls'] = true
+node.default['boxbilling']['headers']['X-Test-Header'] = 'Test Header'
 
 include_recipe 'boxbilling'
 

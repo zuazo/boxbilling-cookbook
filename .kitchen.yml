@@ -16,9 +16,11 @@ platforms:
 - name: centos-6.6
 - name: debian-6.0.10
   run_list: ["recipe[apt]"]
-- name: debian-7.6
+- name: debian-7.8
   run_list: ["recipe[apt]"]
 - name: fedora-19
+  driver_config:
+    box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_fedora-19_chef-provisionerless.box
 - name: fedora-20
 - name: ubuntu-12.04
   run_list: ["recipe[apt]"]
@@ -35,7 +37,7 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.14.2/BoxBilling.zip
+      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.16.3/BoxBilling.zip
 - name: nginx
   excludes:
   # not supported by php-fpm cookbook
@@ -44,5 +46,5 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.14.2/BoxBilling.zip
+      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.16.3/BoxBilling.zip
       web_server: nginx

@@ -344,7 +344,7 @@ You can use GitHub to download the release. For example:
 
 ```ruby
 node.default['boxbilling']['config']['license'] = '...' # BB_LICENSE key
-node.default['boxbilling']['download_url'] = 'https://github.com/boxbilling/boxbilling/releases/download/4.14.2/BoxBilling.zip'
+node.default['boxbilling']['download_url'] = 'https://github.com/boxbilling/boxbilling/releases/download/4.16.3/BoxBilling.zip'
 
 include_recipe 'boxbilling::default'
 ```
