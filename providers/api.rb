@@ -77,7 +77,7 @@ end
 
 # Remove unnecessary slashes
 def filter_path(path)
-  path.gsub(%r{(^/*|/*$)}, '').gsub(/\/+/, '/')
+  path.gsub(%r{(^/*|/*$)}, '').gsub(%r{/+}, '/')
 end
 
 def slugify(string)

@@ -53,7 +53,7 @@ describe 'boxbilling::_nginx' do
   context 'nginx_site default definition' do
     it 'disables default site' do
       allow(::File).to receive(:symlink?).and_call_original
-      allow(::File).to receive(:symlink?).with(/sites-enabled\/default$/)
+      allow(::File).to receive(:symlink?).with(%r{sites-enabled/default$})
         .and_return(true)
       expect(chef_run).to run_execute('nxdissite default')
     end
@@ -67,9 +67,9 @@ describe 'boxbilling::_nginx' do
     it 'enables boxbilling site' do
       allow(::File).to receive(:symlink?).and_call_original
       allow(::File).to receive(:symlink?)
-        .with(/sites-enabled\/boxbilling$/).and_return(false)
+        .with(%r{sites-enabled/boxbilling$}).and_return(false)
       allow(::File).to receive(:symlink?)
-        .with(/sites-enabled\/000-boxbilling$/).and_return(false)
+        .with(%r{sites-enabled/000-boxbilling$}).and_return(false)
       expect(chef_run).to run_execute('nxensite boxbilling')
     end
   end
@@ -89,9 +89,9 @@ describe 'boxbilling::_nginx' do
       it 'enables boxbilling site' do
         allow(::File).to receive(:symlink?).and_call_original
         allow(::File).to receive(:symlink?)
-          .with(/sites-enabled\/boxbilling-ssl$/).and_return(false)
+          .with(%r{sites-enabled/boxbilling-ssl$}).and_return(false)
         allow(::File).to receive(:symlink?)
-          .with(/sites-enabled\/000-boxbilling-ssl$/).and_return(false)
+          .with(%r{sites-enabled/000-boxbilling-ssl$}).and_return(false)
         expect(chef_run).to run_execute('nxensite boxbilling-ssl')
       end
     end # context nginx_site boxbilling-ssl definition

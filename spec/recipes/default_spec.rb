@@ -204,7 +204,7 @@ describe 'boxbilling::default' do
     expect(chef_run).to create_cron('boxbilling cron')
       .with_user('www-data')
       .with_minute('*/5')
-      .with_command(/^php -f '.*\/bb-cron.php'$/)
+      .with_command(%r{^php -f '.*/bb-cron.php'$})
   end
 
   it 'does nothing with update boxbilling' do
