@@ -3,6 +3,11 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v0.9.0 (2015-05-19)
+
+* Add custom HTTP headers support in nginx.
+* Update RuboCop to version `0.31.0`.
+
 ## v0.8.0 (2015-03-13)
 
 * `RecipeHelpers#boxbilling_upload_cookbook_file`: Upload files to the root directory instead of *bb-uploads* (disallowed in robots.txt).
