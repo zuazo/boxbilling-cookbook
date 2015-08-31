@@ -33,3 +33,12 @@ group :integration, :integration_cloud do
   gem 'kitchen-ec2', '~> 0.8'
   gem 'kitchen-digitalocean', '~> 0.8'
 end
+
+group :guard do
+  gem 'guard', '~> 2.12'
+  gem 'guard-foodcritic', '~> 1.1'
+  gem 'guard-rubocop', '~> 1.2'
+  gem 'guard-rspec', '~> 4.6'
+  # Temporary disabled: Error is: cannot load such file -- guard/kitchen
+  # gem 'guard-kitchen', '~> 0.0.0'
+end
