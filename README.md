@@ -1,11 +1,11 @@
-Description
-===========
+BoxBilling Cookbook
+===================
 [![Cookbook Version](https://img.shields.io/cookbook/v/boxbilling.svg?style=flat)](https://supermarket.chef.io/cookbooks/boxbilling)
 [![Dependency Status](http://img.shields.io/gemnasium/zuazo/boxbilling-cookbook.svg?style=flat)](https://gemnasium.com/zuazo/boxbilling-cookbook)
 [![Code Climate](http://img.shields.io/codeclimate/github/zuazo/boxbilling-cookbook.svg?style=flat)](https://codeclimate.com/github/zuazo/boxbilling-cookbook)
 [![Build Status](http://img.shields.io/travis/zuazo/boxbilling-cookbook.svg?style=flat)](https://travis-ci.org/zuazo/boxbilling-cookbook)
 
-Chef cookbook to install and configure [BoxBilling](http://www.boxbilling.com/), invoice and client management software.
+[Chef](https://www.chef.io/) cookbook to install and configure [BoxBilling](http://www.boxbilling.com/), invoice and client management software.
 
 Requirements
 ============
