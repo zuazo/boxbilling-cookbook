@@ -1,9 +1,9 @@
 Description
 ===========
 [![Cookbook Version](https://img.shields.io/cookbook/v/boxbilling.svg?style=flat)](https://supermarket.chef.io/cookbooks/boxbilling)
-[![Dependency Status](http://img.shields.io/gemnasium/onddo/boxbilling-cookbook.svg?style=flat)](https://gemnasium.com/onddo/boxbilling-cookbook)
-[![Code Climate](http://img.shields.io/codeclimate/github/onddo/boxbilling-cookbook.svg?style=flat)](https://codeclimate.com/github/onddo/boxbilling-cookbook)
-[![Build Status](http://img.shields.io/travis/onddo/boxbilling-cookbook.svg?style=flat)](https://travis-ci.org/onddo/boxbilling-cookbook)
+[![Dependency Status](http://img.shields.io/gemnasium/zuazo/boxbilling-cookbook.svg?style=flat)](https://gemnasium.com/zuazo/boxbilling-cookbook)
+[![Code Climate](http://img.shields.io/codeclimate/github/zuazo/boxbilling-cookbook.svg?style=flat)](https://codeclimate.com/github/zuazo/boxbilling-cookbook)
+[![Build Status](http://img.shields.io/travis/zuazo/boxbilling-cookbook.svg?style=flat)](https://travis-ci.org/zuazo/boxbilling-cookbook)
 
 Chef cookbook to install and configure [BoxBilling](http://www.boxbilling.com/), invoice and client management software.
 
@@ -21,7 +21,7 @@ This cookbook has been tested on the following platforms:
 * RedHat
 * Ubuntu
 
-Please, [let us know](https://github.com/onddo/boxbilling-cookbook/issues/new?title=I%20have%20used%20it%20successfully%20on%20...) if you use it successfully on any other platform.
+Please, [let us know](https://github.com/zuazo/boxbilling-cookbook/issues/new?title=I%20have%20used%20it%20successfully%20on%20...) if you use it successfully on any other platform.
 
 ## Required Cookbooks
 
@@ -320,7 +320,7 @@ Another alternative is to include it in your *Run List*:
 
 ```json
 {
-  "name": "bb.onddo.com",
+  "name": "client.example.com",
   [...]
   "normal": {
     "boxbilling": {
@@ -720,7 +720,7 @@ end
 Testing
 =======
 
-See [TESTING.md](https://github.com/onddo/boxbilling-cookbook/blob/master/TESTING.md).
+See [TESTING.md](https://github.com/zuazo/boxbilling-cookbook/blob/master/TESTING.md).
 
 ## ChefSpec Matchers
 
@@ -770,14 +770,14 @@ expect(chef_run).to delete_boxbilling_api(path)
 Contributing
 ============
 
-Please do not hesitate to [open an issue](https://github.com/onddo/boxbilling-cookbook/issues/new) with any questions or problems.
+Please do not hesitate to [open an issue](https://github.com/zuazo/boxbilling-cookbook/issues/new) with any questions or problems.
 
-See [CONTRIBUTING.md](https://github.com/onddo/boxbilling-cookbook/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/zuazo/boxbilling-cookbook/blob/master/CONTRIBUTING.md).
 
 TODO
 ====
 
-See [TODO.md](https://github.com/onddo/boxbilling-cookbook/blob/master/TODO.md).
+See [TODO.md](https://github.com/zuazo/boxbilling-cookbook/blob/master/TODO.md).
 
 
 License and Author
@@ -786,8 +786,9 @@ License and Author
 |                      |                                          |
 |:---------------------|:-----------------------------------------|
 | **Author:**          | [Raul Rodriguez](https://github.com/raulr) (<raul@onddo.com>)
-| **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@onddo.com>)
-| **Copyright:**       | Copyright (c) 2013-2015, Onddo Labs, SL. (www.onddo.com)
+| **Author:**          | [Xabier de Zuazo](https://github.com/zuazo) (<xabier@zuazo.org>)
+| **Copyright:**       | Copyright (c) 2015, Xabier de Zuazo
+| **Copyright:**       | Copyright (c) 2013-2015, Onddo Labs, SL.
 | **License:**         | Apache License, Version 2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");

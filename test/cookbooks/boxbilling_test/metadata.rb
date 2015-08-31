@@ -2,8 +2,8 @@
 #
 # Cookbook Name:: boxbilling_test
 # Author:: Raul Rodriguez (<raul@onddo.com>)
-# Author:: Xabier de Zuazo (<xabier@onddo.com>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL. (www.onddo.com)
+# Author:: Xabier de Zuazo (<xabier@zuazo.org>)
+# Copyright:: Copyright (c) 2014 Onddo Labs, SL.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,8 +20,8 @@
 #
 
 name 'boxbilling_test'
-maintainer 'Onddo Labs, Sl.'
-maintainer_email 'team@onddo.com'
+maintainer 'Xabier de Zuazo'
+maintainer_email 'xabier@zuazo.org'
 license 'Apache 2.0'
 description 'This cookbook is used with test-kitchen to test the parent, '\
             'boxbilling cookbook'
