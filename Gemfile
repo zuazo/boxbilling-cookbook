@@ -6,9 +6,12 @@ source 'https://rubygems.org'
 
 chef_version = ENV.key?('CHEF_VERSION') ? ENV['CHEF_VERSION'] : nil
 
+group :doc do
+  gem 'yard', '~> 0.8'
+end
+
 group :test do
   gem 'rake'
-  gem 'rspec', '~> 3.0'
   gem 'berkshelf', '~> 3.1'
 end
 
@@ -24,12 +27,19 @@ group :unit do
 end
 
 group :integration do
-  gem 'vagrant-wrapper', '~> 2.0'
   gem 'test-kitchen', '~> 1.2'
+end
+
+group :integration_docker do
+  gem 'kitchen-docker', '~> 2.1'
+end
+
+group :integration_vagrant do
+  gem 'vagrant-wrapper', '~> 2.0'
   gem 'kitchen-vagrant', '~> 0.10'
 end
 
-group :integration, :integration_cloud do
+group :integration_cloud do
   gem 'kitchen-ec2', '~> 0.8'
   gem 'kitchen-digitalocean', '~> 0.8'
 end
@@ -41,4 +51,8 @@ group :guard do
   gem 'guard-rspec', '~> 4.6'
   # Temporary disabled: Error is: cannot load such file -- guard/kitchen
   # gem 'guard-kitchen', '~> 0.0.0'
+end
+
+group :travis do
+  gem 'coveralls', '~> 0.7', require: false
 end

@@ -20,6 +20,8 @@
 # limitations under the License.
 #
 
+include_recipe 'netstat'
+
 node.default['mysql']['server_root_password'] = 'vagrant_root'
 node.default['mysql']['server_debian_password'] = 'vagrant_debian'
 node.default['mysql']['server_repl_password'] = 'vagrant_repl'
@@ -39,3 +41,6 @@ include_recipe 'boxbilling'
     mode '00644'
   end
 end
+
+# Required by bats integration tests:
+package 'wget'

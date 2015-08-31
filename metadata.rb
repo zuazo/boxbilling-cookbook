@@ -44,6 +44,7 @@ supports 'redhat'
 supports 'ubuntu'
 
 depends 'apache2', '~> 3.0'
+depends 'cron', '~> 1.6'
 depends 'database', '= 2.3.1'
 depends 'encrypted_attributes', '~> 0.2'
 depends 'mysql', '~> 5.0'

@@ -1,0 +1,12 @@
+---
+driver:
+  name: docker
+  use_sudo: false
+
+# If you add new platforms below, include them in the .travis.yml file matrix
+platforms:
+- name: centos-6
+- name: debian-6
+  run_list: recipe[apt]
+- name: debian-7
+  run_list: recipe[apt]
