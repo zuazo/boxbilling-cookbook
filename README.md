@@ -41,162 +41,38 @@ Please, [let us know](https://github.com/zuazo/boxbilling-cookbook/issues/new?ti
 Attributes
 ==========
 
-<table>
-  <tr>
-    <th>Attribute</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['version']</code></td>
-    <td>BoxBilling version.</td>
-    <td><code>'4.19.1'</code></td>
-  <tr>
-    <td><code>node['boxbilling']['download_url']</code></td>
-    <td>BoxBilling download URL.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['required_packages']</code></td>
-    <td>BoxBilling required packages.</td>
-    <td><code>%w(unzip)</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['php_packages']</code></td>
-    <td>BoxBilling required PHP packages.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['dir']</code></td>
-    <td>BoxBilling installation directory.</td>
-    <td><code>'/srv/www/boxbilling'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['server_name']</code></td>
-    <td>BoxBilling server name.</td>
-    <td><code>node['fqdn']</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['cron_enabled']</code></td>
-    <td>Whether to enable BoxBilling cron job.</td>
-    <td><code>true</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['headers']</code></td>
-    <td>BoxBilling HTTP headers to set as hash.</td>
-    <td><code>{}</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['ssl']</code></td>
-    <td>Whether to enable SSL in BoxBilling.</td>
-    <td><code>true</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['encrypt_attributes']</code></td>
-    <td>Whether to encrypt BoxBilling attributes containing credential secrets.</td>
-    <td><code>false</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['web_server']</code></td>
-    <td>Web server to use: <code>'apache'</code> or <code>'nginx'</code></td>
-    <td><code>'apache'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['admin']['email']</code></td>
-    <td>BoxBilling admin email.</td>
-    <td><code>"admin@#{node['boxbilling']['server_name']}"</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['admin']['pass']</code></td>
-    <td>BoxBilling admin password.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['timezone']</code></td>
-    <td>BoxBilling timezone. See <a href="http://php.net/manual/en/timezones.php">PHP supported timezones</a>.</td>
-    <td><code>'America/New_York'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['db_host']</code></td>
-    <td>BoxBilling database host.</td>
-    <td><code>'localhost'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['db_name']</code></td>
-    <td>BoxBilling database name.</td>
-    <td><code>'boxbilling'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['db_user']</code></td>
-    <td>BoxBilling database user.</td>
-    <td><code>'boxbilling'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['db_password']</code></td>
-    <td>BoxBilling database user password.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['url']</code></td>
-    <td>BoxBilling URL.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['license']</code></td>
-    <td>BoxBilling license key (<strong>required</strong>). Go to <a href="http://www.boxbilling.com/order">BoxBilling order page</a> to get a new license.</td>
-    <td><code>nil</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['locale']</code></td>
-    <td>BoxBilling locale.</td>
-    <td><code>'en_US'</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['sef_urls']</code></td>
-    <td>Whether to enable BoxBilling <em>search engine friendly</em> URLs.</td>
-    <td><code>false</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['config']['debug']</code></td>
-    <td>Whether to enable BoxBilling debug mode.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['api_config']['require_referer_header']</code></td>
-    <td>Whether to enable <em>require referer header</em> in the API.</td>
-    <td><code>true</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['api_config']['allowed_ips']</code></td>
-    <td>BoxBilling allowed IP addresses to access the API. Empty array will allow all IPs to access the API.</td>
-    <td><code>[]</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['api_config']['rate_span']</code></td>
-    <td>BoxBilling API time span for limit in seconds.</td>
-    <td><code>3600</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['api_config']['rate_limit']</code></td>
-    <td>BoxBilling API requests allowed per time span.</td>
-    <td><code>1000</code></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['mysql']['server_root_password']</code></td>
-    <td>BoxBilling MySQL <em>root</em> password.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['mysql']['server_debian_password']</code></td>
-    <td>BoxBilling MySQL <em>debian</em> user password.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td><code>node['boxbilling']['mysql']['server_repl_password']</code></td>
-    <td>BoxBilling MySQL <em>repl</em> user password.</td>
-    <td><em>calculated</em></td>
-  </tr>
-</table>
+| Attribute                                                    | Default                 | Description                    |
+|:-------------------------------------------------------------|:------------------------|:-------------------------------|
+| `node['boxbilling']['version']`                              | `'4.19.1'`              | BoxBilling version.
+| `node['boxbilling']['download_url']`                         | *calculated*            | BoxBilling download URL.
+| `node['boxbilling']['required_packages']`                    | `%w(unzip)`             | BoxBilling required packages.
+| `node['boxbilling']['php_packages']`                         | *calculated*            | BoxBilling required PHP packages.
+| `node['boxbilling']['dir']`                                  | `'/srv/www/boxbilling'` | BoxBilling installation directory.
+| `node['boxbilling']['server_name']`                          | `node['fqdn']`          | BoxBilling server name.
+| `node['boxbilling']['cron_enabled']`                         | `true`                  | Whether to enable BoxBilling cron job.
+| `node['boxbilling']['headers']`                              | `{}`                    | BoxBilling HTTP headers to set as hash.
+| `node['boxbilling']['ssl']`                                  | `true`                  | Whether to enable SSL in BoxBilling.
+| `node['boxbilling']['encrypt_attributes']`                   | `false`                 | Whether to encrypt BoxBilling attributes containing credential secrets.
+| `node['boxbilling']['web_server']`                           | `'apache'`              | Web server to use: `'apache'` or `'nginx'`
+| `node['boxbilling']['admin']['email']`                       | *calculated*            | BoxBilling admin email.
+| `node['boxbilling']['admin']['pass']`                        | *calculated*            | BoxBilling admin password.
+| `node['boxbilling']['config']['timezone']`                   | `'America/New_York'`    | BoxBilling timezone. See [PHP supported timezones](http://php.net/manual/en/timezones.php).
+| `node['boxbilling']['config']['db_host']`                    | `'localhost'`           | BoxBilling database host.
+| `node['boxbilling']['config']['db_name']`                    | `'boxbilling'`          | BoxBilling database name.
+| `node['boxbilling']['config']['db_user']`                    | `'boxbilling'`          | BoxBilling database user.
+| `node['boxbilling']['config']['db_password']`                | *calculated*            | BoxBilling database user password.
+| `node['boxbilling']['config']['url']`                        | *calculated*            | BoxBilling URL.
+| `node['boxbilling']['config']['license']`                    | `nil`                   | BoxBilling license key (**required**). Go to [BoxBilling order page](http://www.boxbilling.com/order) to get a new license.
+| `node['boxbilling']['config']['locale']`                     | `'en_US'`               | BoxBilling locale.
+| `node['boxbilling']['config']['sef_urls']`                   | `false`                 | Whether to enable BoxBilling *search engine friendly* URLs.
+| `node['boxbilling']['config']['debug']`                      | *calculated*            | Whether to enable BoxBilling debug mode.
+| `node['boxbilling']['api_config']['require_referer_header']` | `true`                  | Whether to enable *require referer header* in the API.
+| `node['boxbilling']['api_config']['allowed_ips']`            | `[]`                    | BoxBilling allowed IP addresses to access the API. Empty array will allow all IPs to access the API.
+| `node['boxbilling']['api_config']['rate_span']`              | `3600`                  | BoxBilling API time span for limit in seconds.
+| `node['boxbilling']['api_config']['rate_limit']`             | `1000`                  | BoxBilling API requests allowed per time span.
+| `node['boxbilling']['mysql']['server_root_password']`        | *calculated*            | BoxBilling MySQL *root* password.
+| `node['boxbilling']['mysql']['server_debian_password']`      | *calculated*            | BoxBilling MySQL *debian* user password.
+| `node['boxbilling']['mysql']['server_repl_password']`        | *calculated*            | BoxBilling MySQL *repl* user password.
 
 ## The HTTPS Certificate
 
@@ -268,33 +144,12 @@ This resource uses the [BoxBilling v2 Admin API](http://www.boxbilling.com/docs/
 
 ## boxbilling_api Parameters
 
-<table>
-  <tr>
-    <th>Parameter</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td>path</td>
-    <td>BoxBilling API relative path. For example: <code>'admin/product'</code>.</td>
-    <td><em>name</em></td>
-  </tr>
-  <tr>
-    <td>data</td>
-    <td>Data to send as hash.</td>
-    <td><code>{}</code></td>
-  </tr>
-  <tr>
-    <td>debug</td>
-    <td>Whether to enable debug mode.</td>
-    <td><em>calculated</em></td>
-  </tr>
-  <tr>
-    <td>ignore_failure</td>
-    <td>Ignore API HTTP errors.</td>
-    <td><code>false</code></td>
-  </tr>
-</table>
+| Parameter      | Default      | Description                    |
+|:---------------|:-------------|:-------------------------------|
+| path           | *name*       | BoxBilling API relative path. For example: `'admin/product'`.
+| data           | `{}`         | Data to send as hash.
+| debug          | *calculated* | Whether to enable debug mode.
+| ignore_failure | `false`      | Ignore API HTTP errors.
 
 Usage
 =====
