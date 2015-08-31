@@ -62,8 +62,15 @@ module BoxBilling
       "#{node['boxbilling']['config']['url']}/#{file}"
     end
 
+    def boxbilling_download_url
+      format(
+        node['boxbilling']['download_url'],
+        version: node['boxbilling']['version']
+      )
+    end
+
     def boxbilling_version
-      download_url = node['boxbilling']['download_url']
+      download_url = boxbilling_download_url
       # Uses node#run_state as versions cache
       node.run_state["boxbilling_version_cache_#{download_url}"] ||=
         ::BoxBilling::Version.from_url(download_url)

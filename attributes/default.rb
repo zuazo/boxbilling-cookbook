@@ -28,7 +28,10 @@ end
 
 default['apt']['compile_time_update'] = true unless node['apt'].nil?
 
-default['boxbilling']['download_url'] = 'http://www.boxbilling.com/version/latest.zip'
+default['boxbilling']['version'] = '4.19.1'
+default['boxbilling']['download_url'] =
+  'https://github.com/boxbilling/boxbilling/releases/download/%{version}/'\
+  'BoxBilling.zip'
 
 default['boxbilling']['required_packages'] = %w( unzip )
 default['boxbilling']['php_packages'] =

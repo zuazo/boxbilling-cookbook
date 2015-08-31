@@ -13,7 +13,7 @@ provisioner:
   require_chef_omnibus: true
 
 platforms:
-- name: centos-6.6
+- name: centos-6.7
 - name: debian-6.0.10
   run_list: ["recipe[apt]"]
 - name: debian-7.8
@@ -32,12 +32,9 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: http://mirror.onddo.com/boxbilling-3.6.11.zip
+      download_url: http://files.zuazo.org/boxbilling-3.6.11.zip
 - name: boxbilling4
   run_list: ["recipe[boxbilling_test]"]
-  attributes:
-    boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.16.3/BoxBilling.zip
 - name: nginx
   excludes:
   # not supported by php-fpm cookbook
@@ -46,5 +43,4 @@ suites:
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
-      download_url: https://github.com/boxbilling/boxbilling/releases/download/4.16.3/BoxBilling.zip
       web_server: nginx

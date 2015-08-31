@@ -57,11 +57,17 @@ recipe 'boxbilling::mysql',
 
 provides 'boxbilling_api'
 
+attribute 'boxbilling/version',
+          display_name: 'boxbilling version',
+          description: 'BoxBilling version.',
+          type: 'string',
+          default: '4.19.1'
+
 attribute 'boxbilling/download_url',
           display_name: 'boxbilling download url',
           description: 'BoxBilling download URL.',
           type: 'string',
-          default: 'http://www.boxbilling.com/version/latest.zip'
+          calcualted: true
 
 attribute 'boxbilling/required_packages',
           display_name: 'boxbilling required packages',

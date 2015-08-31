@@ -122,7 +122,7 @@ basename = "BoxBilling-#{boxbilling_version}.zip"
 local_file = ::File.join(Chef::Config[:file_cache_path], basename)
 
 remote_file 'download boxbilling' do
-  source node['boxbilling']['download_url']
+  source recipe.boxbilling_download_url
   path local_file
   action :create_if_missing
 end

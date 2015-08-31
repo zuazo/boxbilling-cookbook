@@ -48,9 +48,13 @@ Attributes
     <th>Default</th>
   </tr>
   <tr>
+    <td><code>node['boxbilling']['version']</code></td>
+    <td>BoxBilling version.</td>
+    <td><code>'4.19.1'</code></td>
+  <tr>
     <td><code>node['boxbilling']['download_url']</code></td>
     <td>BoxBilling download URL.</td>
-    <td><code>'http://www.boxbilling.com/version/latest.zip'</code></td>
+    <td><em>calculated</em></td>
   </tr>
   <tr>
     <td><code>node['boxbilling']['required_packages']</code></td>
