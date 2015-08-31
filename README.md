@@ -43,7 +43,7 @@ Attributes
 
 | Attribute                                                    | Default                 | Description                    |
 |:-------------------------------------------------------------|:------------------------|:-------------------------------|
-| `node['boxbilling']['version']`                              | `'4.19.1'`              | BoxBilling version.
+| `node['boxbilling']['version']`                              | `'4.19.1'`              | BoxBilling version (See [below](#installing-boxbilling-3) for BoxBilling version `3` installation).
 | `node['boxbilling']['download_url']`                         | *calculated*            | BoxBilling download URL.
 | `node['boxbilling']['required_packages']`                    | `%w(unzip)`             | BoxBilling required packages.
 | `node['boxbilling']['php_packages']`                         | *calculated*            | BoxBilling required PHP packages.
@@ -195,15 +195,15 @@ Another alternative is to include it in your *Run List*:
 }
 ```
 
-## Installing BoxBilling 4
+## Installing BoxBilling 3
 
-To install BoxBilling version 4, you must change the `node['boxbilling']['download_url']` attribute.
+To install BoxBilling version `3`, you must change the `node['boxbilling']['download_url']` attribute.
 
 You can use GitHub to download the release. For example:
 
 ```ruby
 node.default['boxbilling']['config']['license'] = '...' # BB_LICENSE key
-node.default['boxbilling']['download_url'] = 'https://github.com/boxbilling/boxbilling/releases/download/4.16.3/BoxBilling.zip'
+node.default['boxbilling']['download_url'] = 'http://files.zuazo.org/boxbilling-3.6.11.zip'
 
 include_recipe 'boxbilling::default'
 ```
