@@ -26,18 +26,19 @@ module BoxBilling
   # Send requests to BoxBilling API
   module API
     # rubocop:disable Style/ClassVars
-
-    DEFAULT_OPTIONS = {
-      path: '/',
-      ssl: false,
-      data: {},
-      host: 'localhost',
-      user: 'admin',
-      api_token: nil,
-      referer: nil,
-      debug: false,
-      endpoint: '/api%{path}'
-    }
+    unless defined?(::BoxBilling::API::DEFAULT_OPTIONS)
+      DEFAULT_OPTIONS = {
+        path: '/',
+        ssl: false,
+        data: {},
+        host: 'localhost',
+        user: 'admin',
+        api_token: nil,
+        referer: nil,
+        debug: false,
+        endpoint: '/api%{path}'
+      }
+    end
 
     @@cookie = nil
 
@@ -122,10 +123,9 @@ module BoxBilling
     end
 
     def self.parse_cookie(response)
-      if response['Set-Cookie'].is_a?(String)
-        self.cookie = response['set-cookie'].split(';')[0]
-        Chef::Log.debug("#{name}##{__method__} cookie: #{cookie}")
-      end
+      return unless response['Set-Cookie'].is_a?(String)
+      self.cookie = response['set-cookie'].split(';')[0]
+      Chef::Log.debug("#{name}##{__method__} cookie: #{cookie}")
     end
 
     def self.parse_http_response(resp)
