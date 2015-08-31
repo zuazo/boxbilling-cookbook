@@ -1,6 +1,6 @@
 Description
 ===========
-[![Cookbook Version](https://img.shields.io/cookbook/v/boxbilling.svg?style=flat)](https://supermarket.getchef.com/cookbooks/boxbilling)
+[![Cookbook Version](https://img.shields.io/cookbook/v/boxbilling.svg?style=flat)](https://supermarket.chef.io/cookbooks/boxbilling)
 [![Dependency Status](http://img.shields.io/gemnasium/onddo/boxbilling-cookbook.svg?style=flat)](https://gemnasium.com/onddo/boxbilling-cookbook)
 [![Code Climate](http://img.shields.io/codeclimate/github/onddo/boxbilling-cookbook.svg?style=flat)](https://codeclimate.com/github/onddo/boxbilling-cookbook)
 [![Build Status](http://img.shields.io/travis/onddo/boxbilling-cookbook.svg?style=flat)](https://travis-ci.org/onddo/boxbilling-cookbook)
@@ -25,14 +25,14 @@ Please, [let us know](https://github.com/onddo/boxbilling-cookbook/issues/new?ti
 
 ## Required Cookbooks
 
-* [apache2](https://supermarket.getchef.com/cookbooks/apache2)
-* [database](https://supermarket.getchef.com/cookbooks/database)
-* [encrypted_attributes (~> 0.2)](https://supermarket.getchef.com/cookbooks/encrypted_attributes)
-* [mysql (~> 5.0)](https://supermarket.getchef.com/cookbooks/mysql)
-* [openssl](https://supermarket.getchef.com/cookbooks/openssl)
-* [php](https://supermarket.getchef.com/cookbooks/php)
-* [ssl_certificate](https://supermarket.getchef.com/cookbooks/ssl_certificate)
-* [yum-epel](https://supermarket.getchef.com/cookbooks/yum-epel)
+* [apache2](https://supermarket.chef.io/cookbooks/apache2)
+* [database](https://supermarket.chef.io/cookbooks/database)
+* [encrypted_attributes (~> 0.2)](https://supermarket.chef.io/cookbooks/encrypted_attributes)
+* [mysql (~> 5.0)](https://supermarket.chef.io/cookbooks/mysql)
+* [openssl](https://supermarket.chef.io/cookbooks/openssl)
+* [php](https://supermarket.chef.io/cookbooks/php)
+* [ssl_certificate](https://supermarket.chef.io/cookbooks/ssl_certificate)
+* [yum-epel](https://supermarket.chef.io/cookbooks/yum-epel)
 
 ## Required Applications
 
@@ -196,7 +196,7 @@ Attributes
 
 ## The HTTPS Certificate
 
-This cookbook uses the [`ssl_certificate`](https://supermarket.getchef.com/cookbooks/ssl_certificate) cookbook to create the HTTPS certificate. The namespace used is `node['boxbilling']`. For example:
+This cookbook uses the [`ssl_certificate`](https://supermarket.chef.io/cookbooks/ssl_certificate) cookbook to create the HTTPS certificate. The namespace used is `node['boxbilling']`. For example:
 
 ```ruby
 node.default['boxbilling']['common_name'] = 'boxbilling.example.com'
@@ -204,11 +204,11 @@ node.default['boxbilling']['config']['license'] = '...' # BB_LICENSE key
 include_recipe 'boxbilling'
 ```
 
-See the [`ssl_certificate` namespace documentation](https://supermarket.getchef.com/cookbooks/ssl_certificate#namespaces) for more information.
+See the [`ssl_certificate` namespace documentation](https://supermarket.chef.io/cookbooks/ssl_certificate#namespaces) for more information.
 
 ## Encrypted Attributes
 
-This cookbook can use the [encrypted_attributes](https://supermarket.getchef.com/cookbooks/encrypted_attributes) cookbook to encrypt the secrets generated during the *Chef Run*. This feature is disabled by default, but can be enabled setting the `node['boxbilling']['encrypt_attributes']` attribute to `true`. For example:
+This cookbook can use the [encrypted_attributes](https://supermarket.chef.io/cookbooks/encrypted_attributes) cookbook to encrypt the secrets generated during the *Chef Run*. This feature is disabled by default, but can be enabled setting the `node['boxbilling']['encrypt_attributes']` attribute to `true`. For example:
 
 ```ruby
 include_recipe 'encrypted_attributes::users_data_bag'
