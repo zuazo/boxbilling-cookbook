@@ -2,8 +2,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# More info at http://berkshelf.com/#the-berksfile
+
 source 'https://supermarket.chef.io'
-my_cookbook = ::File.basename(Dir.pwd)
+my_cookbook = 'boxbilling'
 
 # Berkshelf helper to include a local cookbook from disk.
 #
