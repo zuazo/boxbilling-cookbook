@@ -1,8 +1,7 @@
 # encoding: UTF-8
 #
-# Author:: Raul Rodriguez (<raul@onddo.com>)
 # Author:: Xabier de Zuazo (<xabier@zuazo.org>)
-# Copyright:: Copyright (c) 2014 Onddo Labs, SL.
+# Copyright:: Copyright (c) 2015 Onddo Labs, SL.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +17,25 @@
 # limitations under the License.
 #
 
-require 'spec_helper'
+require_relative '../spec_helper'
 
-describe 'boxbilling::mysql' do
-  let(:mysql_service) { 'mysql_service_name' }
+describe 'boxbilling::_php_fpm' do
   let(:chef_runner) { ChefSpec::SoloRunner.new }
   let(:chef_run) { chef_runner.converge(described_recipe) }
   let(:node) { chef_runner.node }
-  before { node.set['mysql']['service_name'] = mysql_service }
+  before do
+    stub_command(
+      'test -d /etc/php5/fpm/pool.d || mkdir -p /etc/php5/fpm/pool.d'
+    ).and_return(true)
+  end
 
-  it 'installs mysql' do
-    expect(chef_run).to create_mysql_service(mysql_service)
+  it 'include php-fpm recipe' do
+    expect(chef_run).to include_recipe('php-fpm')
+  end
+
+  it 'creates php FPM pool' do
+    expect(chef_run).to create_template(
+      "#{node['php-fpm']['pool_conf_dir']}/boxbilling.conf"
+    )
   end
 end

@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-require 'spec_helper'
+require_relative '../spec_helper'
 
 class Chef
   # make `Kernel#require` mockable
