@@ -26,6 +26,7 @@ Please, [let us know](https://github.com/zuazo/boxbilling-cookbook/issues/new?ti
 ## Required Cookbooks
 
 * [apache2](https://supermarket.chef.io/cookbooks/apache2)
+* [cron](https://supermarket.chef.io/cookbooks/cron)
 * [database](https://supermarket.chef.io/cookbooks/database)
 * [encrypted_attributes (~> 0.2)](https://supermarket.chef.io/cookbooks/encrypted_attributes)
 * [mysql (~> 5.0)](https://supermarket.chef.io/cookbooks/mysql)

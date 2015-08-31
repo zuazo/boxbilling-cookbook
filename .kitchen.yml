@@ -28,12 +28,12 @@ platforms:
   run_list: ["recipe[apt]"]
 
 suites:
-- name: boxbilling3
+- name: bb3
   run_list: ["recipe[boxbilling_test]"]
   attributes:
     boxbilling:
       download_url: http://files.zuazo.org/boxbilling-3.6.11.zip
-- name: boxbilling4
+- name: bb4
   run_list: ["recipe[boxbilling_test]"]
 - name: nginx
   excludes:

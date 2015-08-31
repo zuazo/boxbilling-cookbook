@@ -276,6 +276,8 @@ end
 # Enable cron for background jobs
 #==============================================================================
 
+include_recipe 'cron'
+
 if node['boxbilling']['cron_enabled']
   cron 'boxbilling cron' do
     user boxbilling_web_user

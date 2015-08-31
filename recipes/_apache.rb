@@ -43,6 +43,8 @@ if boxbilling_lt4?
     action :create_if_missing
   end
 
+  package 'tar'
+
   execute 'install ioncube' do
     command <<-EOF
       cd "$(php -i | awk '$1 == "extension_dir" {print $NF}')" &&
