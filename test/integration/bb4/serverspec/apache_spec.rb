@@ -26,4 +26,3 @@ describe server(:web) do
     end
   end # http /
 end # server web
-

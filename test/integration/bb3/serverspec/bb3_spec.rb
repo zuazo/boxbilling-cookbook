@@ -32,7 +32,7 @@ describe server(:web) do
     end
   end # http bb-admin
 
-  describe http("https://127.0.0.1:443/", ssl: { verify: false }) do
+  describe http('https://127.0.0.1:443/', ssl: { verify: false }) do
     it 'includes PHP cookie' do
       expect(response['Set-Cookie']).to include 'BOXSID'
     end

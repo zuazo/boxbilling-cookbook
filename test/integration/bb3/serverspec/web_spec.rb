@@ -34,7 +34,7 @@ describe server(:web) do
     end
   end # http /
 
-  describe http("https://127.0.0.1:443/", ssl: { verify: false }) do
+  describe http('https://127.0.0.1:443/', ssl: { verify: false }) do
     it 'returns "BoxBilling" string' do
       expect(response.body).to include('BoxBilling')
     end
