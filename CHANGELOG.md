@@ -3,6 +3,27 @@ boxbilling CHANGELOG
 
 This file is used to list changes made in each version of the `boxbilling` cookbook.
 
+## v1.0.0 (2015-09-01)
+
+* Install BoxBilling 4 by default, adds `node['boxbilling']['version']` attribute (**breaking change**).
+* Update chef links to use *chef.io* domain.
+* Update contact information and links after migration.
+* metadata: Add `source_url` and `issues_url`.
+
+* Documentation:
+ * README:
+  * Use markdown tables.
+  * Improve description.
+
+* Testing:
+ * Replace all bats integration tests by [Serverspec](http://serverspec.org/) and [infrataster](https://github.com/ryotarai/infrataster) tests.
+ * Fix *already initialized constant* warning.
+ * Gemfile: Update RuboCop to `0.33.0`.
+ * Move ChefSpec tests to *test/unit*.
+ * Add a Guardfile.
+ * Rakefile: Add clean task.
+ * Travis CI: Run tests on Ruby `2.2`.
+
 ## v0.9.0 (2015-05-19)
 
 * Add custom HTTP headers support in nginx.

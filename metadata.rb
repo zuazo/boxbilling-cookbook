@@ -27,7 +27,7 @@ description <<-EOS
 Installs and configures BoxBilling, invoice and client management software
 EOS
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '0.10.0' # WiP
+version '1.0.0'
 
 if respond_to?(:source_url)
   source_url "https://github.com/zuazo/#{name}-cookbook"
