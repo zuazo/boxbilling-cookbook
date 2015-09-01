@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@zuazo.org>)
-# Copyright:: Copyright (c) 2015 Onddo Labs, SL.
+# Copyright:: Copyright (c) 2015 Xabier de Zuazo
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,26 +19,22 @@
 
 require 'spec_helper'
 
-family = os[:family].downcase
+describe server(:web) do
+  describe http('/') do
+    it 'includes PHP cookie' do
+      expect(response['Set-Cookie']).to include 'PHPSESSID'
+    end
+  end # http /
 
-web_user, web_group =
-  if %w(debian ubuntu).include?(family)
-    %w(www-data www-data)
-  elsif %w(redhat centos fedora scientific amazon).include?(family)
-    %w(apache apache)
-  elsif %w(suse opensuse).include?(family)
-    %w(wwwrun www)
-  elsif %w(arch).include?(family)
-    %w(http http)
-  elsif %w(freebsd).include?(family)
-    %w(www www)
-  else
-    %w(www-data www-data)
+  describe http('/bb-admin/staff/login') do
+    it 'includes boxbilling version' do
+      expect(response.body).to include 'BoxBilling 4.'
+    end
   end
 
-describe file('/srv/www/boxbilling/bb-config.php') do
-  it { should be_file }
-  it { should be_mode 640 }
-  it { should be_owned_by web_user }
-  it { should be_grouped_into web_group }
-end
+  describe http("https://127.0.0.1:443/", ssl: { verify: false }) do
+    it 'includes PHP cookie' do
+      expect(response['Set-Cookie']).to include 'PHPSESSID'
+    end
+  end # https
+end # server web

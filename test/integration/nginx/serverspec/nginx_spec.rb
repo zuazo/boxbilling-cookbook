@@ -1,7 +1,7 @@
 # encoding: UTF-8
 #
 # Author:: Xabier de Zuazo (<xabier@zuazo.org>)
-# Copyright:: Copyright (c) 2015 Onddo Labs, SL.
+# Copyright:: Copyright (c) 2015 Xabier de Zuazo
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,22 +19,11 @@
 
 require 'spec_helper'
 
-describe package('nginx') do
-  it { should be_installed }
-end
+describe server(:web) do
+  describe http('/') do
+    it 'runs nginx httpd' do
+      expect(response['Server']).to include 'nginx'
+    end
+  end # http /
+end # server web
 
-describe port(80) do
-  it { should be_listening }
-end
-
-describe process('nginx') do
-  it { should be_running }
-end
-
-describe process('apache') do
-  it { should_not be_running }
-end
-
-describe process('httpd') do
-  it { should_not be_running }
-end

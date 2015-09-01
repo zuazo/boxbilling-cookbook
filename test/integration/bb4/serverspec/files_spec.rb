@@ -17,26 +17,28 @@
 # limitations under the License.
 #
 
-require 'serverspec'
-require 'infrataster/rspec'
+require 'spec_helper'
 
-# Set backend type
-set :backend, :exec
+family = os[:family].downcase
 
-ENV['PATH'] = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-
-Infrataster::Server.define(:web, '127.0.0.1')
-
-# Infrataster hack to ignore phantomjs SSL errors
-Infrataster::Contexts::CapybaraContext.class_eval do
-  def self.prepare_session
-    driver = Infrataster::Contexts::CapybaraContext::CAPYBARA_DRIVER_NAME
-    Capybara.register_driver driver do |app|
-      Capybara::Poltergeist::Driver.new(
-        app,
-        phantomjs_options: %w(--ignore-ssl-errors=true)
-      )
-    end
-    Capybara::Session.new(driver)
+web_user, web_group =
+  if %w(debian ubuntu).include?(family)
+    %w(www-data www-data)
+  elsif %w(redhat centos fedora scientific amazon).include?(family)
+    %w(apache apache)
+  elsif %w(suse opensuse).include?(family)
+    %w(wwwrun www)
+  elsif %w(arch).include?(family)
+    %w(http http)
+  elsif %w(freebsd).include?(family)
+    %w(www www)
+  else
+    %w(www-data www-data)
   end
+
+describe file('/srv/www/boxbilling/bb-config.php') do
+  it { should be_file }
+  it { should be_mode 640 }
+  it { should be_owned_by web_user }
+  it { should be_grouped_into web_group }
 end

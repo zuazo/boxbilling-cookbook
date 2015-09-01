@@ -19,26 +19,28 @@
 
 require 'spec_helper'
 
-family = os[:family].downcase
-
-web_user, web_group =
-  if %w(debian ubuntu).include?(family)
-    %w(www-data www-data)
-  elsif %w(redhat centos fedora scientific amazon).include?(family)
-    %w(nginx nginx)
-  elsif %w(suse opensuse).include?(family)
-    %w(wwwrun www)
-  elsif %w(arch).include?(family)
-    %w(http http)
-  elsif %w(freebsd).include?(family)
-    %w(www www)
-  else
-    %w(www-data www-data)
-  end
-
-describe file('/srv/www/boxbilling/bb-config.php') do
+describe file('/srv/www/boxbilling/bb-uploads/0wn3d.php') do
   it { should be_file }
-  it { should be_mode 640 }
-  it { should be_owned_by web_user }
-  it { should be_grouped_into web_group }
 end
+
+describe file('/srv/www/boxbilling/bb-data/0wn3d.php') do
+  it { should be_file }
+end
+
+describe server(:web) do
+  describe http('/bb-uploads/0wn3d.php') do
+    it 'disables PHP files in bb-uploads' do
+      expect(response.body).to_not include '0wn3d :-S'
+    end
+
+    it 'returns PHP files source in bb-uploads' do
+      expect(response.body).to include '<?php'
+    end
+  end # http /bb-uploads/0wn3d.php
+
+  describe http('/bb-data/0wn3d.php') do
+    it 'disables PHP files in bb-data' do
+      expect(response.body).to_not include '0wn3d :-S'
+    end
+  end # http /bb-data/0wn3d.php
+end # server web
