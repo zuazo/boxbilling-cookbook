@@ -42,5 +42,5 @@ include_recipe 'boxbilling'
   end
 end
 
-# Required by bats integration tests:
-package 'wget'
+%w(patch tar gzip).each { |x| package x }
+include_recipe 'nokogiri'

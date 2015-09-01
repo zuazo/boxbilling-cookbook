@@ -30,3 +30,4 @@ version '0.1.0'
 
 depends 'boxbilling'
 depends 'netstat', '~> 0.1.0' # Required to run integration tests with Docker
+depends 'nokogiri', '~> 0.1.4'

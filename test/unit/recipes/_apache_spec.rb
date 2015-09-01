@@ -89,6 +89,10 @@ describe 'boxbilling::_apache' do
         )
     end
 
+    it 'installs tar' do
+      expect(chef_run).to install_package('tar')
+    end
+
     it 'installs ioncube' do
       expect(chef_run).to run_execute('install ioncube')
         .with_creates(/ioncube\.ini$/)
