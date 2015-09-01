@@ -4,92 +4,24 @@ rvm:
 - 2.1
 - 2.2
 
-sudo: true
+sudo: false
 
 env:
-  global:
-  - KITCHEN_ARGS="--destroy=always"
-  - KITCHEN_LOCAL_YAML=.kitchen.docker.yml
   matrix:
-  - TESTS="style unit"  CHEF_VERSION="~> 11.0"
-  - TESTS="style unit"  CHEF_VERSION="~> 12.0"
-  - TESTS="integration" KITCHEN_REGEXP=bb3-centos-6
-  - TESTS="integration" KITCHEN_REGEXP=bb3-debian-6
-  - TESTS="integration" KITCHEN_REGEXP=bb3-debian-7
-  - TESTS="integration" KITCHEN_REGEXP=bb4-centos-6
-  - TESTS="integration" KITCHEN_REGEXP=bb4-debian-6
-  - TESTS="integration" KITCHEN_REGEXP=bb4-debian-7
-  - TESTS="integration" KITCHEN_REGEXP=nginx-centos-6
-  - TESTS="integration" KITCHEN_REGEXP=nginx-debian-6
-  - TESTS="integration" KITCHEN_REGEXP=nginx-debian-7
+# CHEF_VERSION is only for unit tests, no for test-kitchen:
+  - CHEF_VERSION="~> 11.0"
+  - CHEF_VERSION="~> 12.0"
 
 matrix:
   exclude:
+# Chef 12 requires Ruby 2:
   - rvm: 1.9.3
-    env: TESTS="style unit"  CHEF_VERSION="~> 12.0"
+    env: CHEF_VERSION="~> 12.0"
+# Chef 11 cannot resolve dependencies in Ruby 2.2 (mixlib-shellout):
   - rvm: 2.2
-    env: TESTS="style unit"  CHEF_VERSION="~> 11.0"
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-centos-6
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-centos-6
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-centos-6
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-debian-6
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-debian-6
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-debian-6
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-debian-7
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-debian-7
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=bb3-debian-7
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-centos-6
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-centos-6
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-centos-6
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-debian-6
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-debian-6
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-debian-6
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-debian-7
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-debian-7
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=bb4-debian-7
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-centos-6
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-centos-6
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-centos-6
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-debian-6
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-debian-6
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-debian-6
-  - rvm: 1.9.3
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-debian-7
-  - rvm: 2.0.0
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-debian-7
-  - rvm: 2.1
-    env: TESTS="integration" KITCHEN_REGEXP=nginx-debian-7
+    env: CHEF_VERSION="~> 11.0"
 
-bundler_args: --without doc integration_vagrant integration_cloud guard
-
-before_script:
-- source <(curl -sL https://raw.githubusercontent.com/zuazo/kitchen-in-travis/0.3.0/scripts/start_docker.sh)
+bundler_args: --without doc integration integration_docker integration_vagrant integration_cloud guard
 
 script:
-- travis_retry bundle exec rake $TESTS
-
-after_failure: cat docker_daemon.log
+- travis_retry bundle exec rake style unit
