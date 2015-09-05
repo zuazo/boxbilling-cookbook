@@ -28,7 +28,6 @@ PATH_SPECIAL_IDS = {
   'admin/servicedomain/tld' => :tld,
   'admin/forum/profile' => :client_id,
   'admin/currency' => :code,
-  'admin/extension/config' => :ext,
   'admin/queue' => :queue,
   'admin/theme' => :code,
   'admin/system/params' => nil,
